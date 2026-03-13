@@ -1,0 +1,8 @@
+.env
+*.m4a
+*.mp3
+*.wav
+*.mp4
+*.mkv
+*.json
+*_full_transcript.txt
