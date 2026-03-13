@@ -1,4 +1,4 @@
-# cerana-toolbox
+# toolbox
 
 CeranaStudio 的內部工具箱 — 包含各種語言寫的 utilities、腳本和小工具。
 
