@@ -66,3 +66,17 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Mobile tab bar: hide on desktop */
+@media (min-width: 640px) {
+  .mobile-tabbar { display: none !important; }
+}
+
+/* List page content: padding for tab bar on mobile */
+@media (max-width: 639px) {
+  .list-page-content {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+  .desktop-nav-btn { display: none !important; }
+  .rent-card-delete { opacity: 1 !important; }
+}

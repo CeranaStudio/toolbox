@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 import { RentInput } from "@/components/RentInput";
 
 export default function Page() {
   const [creating, setCreating] = useState(false);
+  const [backUrl, setBackUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (document.referrer.includes("/list/")) {
+      setBackUrl(document.referrer);
+    }
+  }, []);
 
   const handleResults = useCallback(
     async (results: unknown[]) => {
@@ -59,6 +66,15 @@ export default function Page() {
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--c-text)", letterSpacing: "-0.01em" }}>
             租多好室
           </span>
+          <div style={{ flex: 1 }} />
+          {backUrl && (
+            <a href={backUrl} style={{
+              fontSize: 13, color: "var(--c-muted)", textDecoration: "none",
+              display: "flex", alignItems: "center", gap: 4,
+            }}>
+              ← 返回清單
+            </a>
+          )}
         </div>
       </header>
 

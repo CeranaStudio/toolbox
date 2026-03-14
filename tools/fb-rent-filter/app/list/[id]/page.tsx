@@ -28,6 +28,13 @@ export default function SharedListPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -231,6 +238,7 @@ export default function SharedListPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <a
             href={`/list/${id}/map`}
+            className="desktop-nav-btn"
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '6px 12px',
@@ -265,7 +273,7 @@ export default function SharedListPage() {
         </div>
       </nav>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(16px, 4vw, 24px) 80px' }}>
+      <div className="list-page-content" style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(16px, 4vw, 24px) 80px' }}>
         {/* List header */}
         <div style={{ marginBottom: '28px' }}>
           {editingName ? (
@@ -395,6 +403,86 @@ export default function SharedListPage() {
       )}
 
       <PWAInstallToast />
+
+      {/* Scroll to top FAB */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          style={{
+            position: "fixed",
+            bottom: "calc(72px + env(safe-area-inset-bottom))",
+            right: 16,
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            background: "var(--c-text)",
+            color: "white",
+            border: "none",
+            fontSize: 18,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            zIndex: 99,
+            touchAction: "manipulation",
+          }}
+        >
+          ↑
+        </button>
+      )}
+
+      {/* Mobile tab bar */}
+      <nav className="mobile-tabbar" style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        background: "white",
+        borderTop: "1px solid var(--c-border)",
+        display: "flex",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}>
+        <a href="/" style={{
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 3, padding: "10px 0", fontSize: 10,
+          fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
+          cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
+          textDecoration: "none",
+        }}>
+          <span style={{ fontSize: 20 }}>🏠</span>
+          <span>首頁</span>
+        </a>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 3, padding: "10px 0", fontSize: 10,
+          fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
+          cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
+        }}>
+          <span style={{ fontSize: 20 }}>➕</span>
+          <span>新增</span>
+        </button>
+        <a href={`/list/${id}/map`} style={{
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 3, padding: "10px 0", fontSize: 10,
+          fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
+          cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
+          textDecoration: "none",
+        }}>
+          <span style={{ fontSize: 20 }}>🗺️</span>
+          <span>地圖</span>
+        </a>
+        <button onClick={handleCopyLink} style={{
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 3, padding: "10px 0", fontSize: 10,
+          fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
+          cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
+        }}>
+          <span style={{ fontSize: 20 }}>🔗</span>
+          <span>分享</span>
+        </button>
+      </nav>
     </main>
   );
 }
