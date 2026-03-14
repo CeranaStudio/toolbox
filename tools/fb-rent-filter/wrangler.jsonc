@@ -1,0 +1,13 @@
+{
+  "name": "fb-rent-filter",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".vercel/output/static",
+  "d1_databases": [
+    {
+      "binding": "fb_rent_filter_db",
+      "database_name": "fb-rent-filter-db",
+      "database_id": "ae874d9d-584a-475c-a99f-1c50b93ff171"
+    }
+  ]
+}

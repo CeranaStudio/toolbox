@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npm run pages:build && npx wrangler pages dev",
+    "deploy": "npm run pages:build && npx wrangler pages deploy",
+    "cf-typegen": "npx wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {
     "next": "^15.0.0",
@@ -23,6 +26,8 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@tailwindcss/postcss": "^4.0.0",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.0.0",
+    "@cloudflare/next-on-pages": "^1.0.0",
+    "wrangler": "^3.0.0"
   }
 }
