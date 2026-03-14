@@ -48,8 +48,8 @@ export async function POST(
 
   const stmt = db.prepare(
     `INSERT OR IGNORE INTO records
-      (id, list_id, title, price, deposit, district, address, size, room_type, floor, features, contact, move_in_date, original_text, extracted_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, list_id, title, price, deposit, district, address, size, room_type, floor, features, contact, move_in_date, original_text, extracted_at, status, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
 
   await db.batch(
@@ -69,7 +69,9 @@ export async function POST(
         r.contact ?? null,
         r.moveInDate ?? null,
         r.originalText ?? null,
-        r.extractedAt ?? null
+        r.extractedAt ?? null,
+        (r as Record<string, unknown>).status ?? 'interested',
+        (r as Record<string, unknown>).notes ?? null
       )
     )
   );

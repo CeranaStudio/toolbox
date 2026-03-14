@@ -72,6 +72,34 @@ export default function SharedListPage() {
     );
   }, []);
 
+  const handleStatusChange = useCallback(async (recordId: string, status: string) => {
+    // 樂觀更新
+    setList((prev) =>
+      prev
+        ? { ...prev, records: prev.records.map((r) => (r.id === recordId ? { ...r, status: status as RentRecord["status"] } : r)) }
+        : prev
+    );
+    // 背景 sync 到 D1
+    fetch(`/api/lists/${id}/records/${recordId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }).catch(() => {});
+  }, [id]);
+
+  const handleNotesChange = useCallback(async (recordId: string, notes: string) => {
+    setList((prev) =>
+      prev
+        ? { ...prev, records: prev.records.map((r) => (r.id === recordId ? { ...r, notes } : r)) }
+        : prev
+    );
+    fetch(`/api/lists/${id}/records/${recordId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes }),
+    }).catch(() => {});
+  }, [id]);
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -137,7 +165,7 @@ export default function SharedListPage() {
           </div>
         )}
 
-        <RentTable records={list.records} onDelete={handleDelete} />
+        <RentTable records={list.records} onDelete={handleDelete} onStatusChange={handleStatusChange} onNotesChange={handleNotesChange} />
       </div>
 
       {/* Toast */}

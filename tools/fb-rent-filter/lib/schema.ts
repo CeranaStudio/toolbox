@@ -17,9 +17,22 @@ export const rentRecordSchema = z.object({
   moveInDate: z.string().nullable().describe("可入住時間"),
   originalText: z.string().describe("原始貼文（截斷到 200 字）"),
   extractedAt: z.string().describe("萃取時間 ISO string"),
+  status: z
+    .enum(["interested", "contacted", "visited", "rejected"])
+    .default("interested"),
+  notes: z.string().optional().nullable(),
 });
 
 export type RentRecord = z.infer<typeof rentRecordSchema> & { id: string };
+
+export const STATUS_CONFIG = {
+  interested: { label: "想看", color: "#3B82F6" },
+  contacted: { label: "已聯絡", color: "#F59E0B" },
+  visited: { label: "已看房", color: "#10B981" },
+  rejected: { label: "已放棄", color: "#9CA3AF" },
+} as const;
+
+export type RecordStatus = keyof typeof STATUS_CONFIG;
 
 export const analyzeRequestSchema = z.object({
   posts: z.array(z.string().min(1)),

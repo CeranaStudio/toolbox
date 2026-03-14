@@ -29,3 +29,11 @@ export function deleteRecord(id: string): RentRecord[] {
   saveRecords(records);
   return records;
 }
+
+export function updateRecord(id: string, patch: Partial<RentRecord>): RentRecord[] {
+  const records = getRecords().map((r) =>
+    r.id === id ? { ...r, ...patch } : r
+  );
+  saveRecords(records);
+  return records;
+}

@@ -42,6 +42,8 @@ export async function GET(
     moveInDate: r.move_in_date,
     originalText: r.original_text,
     extractedAt: r.extracted_at,
+    status: r.status ?? 'interested',
+    notes: r.notes ?? null,
   }));
 
   return NextResponse.json({ ...list, records });

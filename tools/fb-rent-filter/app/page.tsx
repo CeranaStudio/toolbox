@@ -5,7 +5,7 @@ import { Check, Loader2, X } from "lucide-react";
 import { RentInput } from "@/components/RentInput";
 import { RentTable } from "@/components/RentTable";
 import { ExportBar } from "@/components/ExportBar";
-import { getRecords, saveRecords, addRecords, deleteRecord } from "@/lib/storage";
+import { getRecords, saveRecords, addRecords, deleteRecord, updateRecord } from "@/lib/storage";
 import type { RentRecord } from "@/lib/schema";
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -84,6 +84,16 @@ export default function Page() {
     const updated = deleteRecord(id);
     setRecords(updated);
     setSavedUrl("");
+  }, []);
+
+  const handleStatusChange = useCallback((id: string, status: string) => {
+    const updated = updateRecord(id, { status: status as RentRecord["status"] });
+    setRecords(updated);
+  }, []);
+
+  const handleNotesChange = useCallback((id: string, notes: string) => {
+    const updated = updateRecord(id, { notes });
+    setRecords(updated);
   }, []);
 
   const handleClearAll = useCallback(() => {
@@ -376,7 +386,7 @@ export default function Page() {
 
         {/* Cards */}
         <section style={{ paddingBottom: 80 }}>
-          <RentTable records={records} onDelete={handleDelete} />
+          <RentTable records={records} onDelete={handleDelete} onStatusChange={handleStatusChange} onNotesChange={handleNotesChange} />
         </section>
       </div>
 
