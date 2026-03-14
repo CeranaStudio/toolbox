@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Cloud, Check, Loader2, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { RentInput } from "@/components/RentInput";
 import { RentTable } from "@/components/RentTable";
 import { ExportBar } from "@/components/ExportBar";
@@ -15,9 +15,29 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-[slideUp_0.3s_ease-out]">
-      <div className="flex items-center gap-2 bg-charcoal text-warm-white text-sm px-5 py-3">
-        <Check className="h-4 w-4 text-accent shrink-0" />
+    <div
+      style={{
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 50,
+        animation: "slideUp 0.3s ease-out",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: "var(--c-text)",
+          color: "var(--c-bg)",
+          fontSize: 14,
+          padding: "10px 20px",
+          borderRadius: 8,
+        }}
+      >
+        <Check style={{ width: 16, height: 16, color: "var(--c-accent)", flexShrink: 0 }} />
         <span>{message}</span>
       </div>
     </div>
@@ -27,11 +47,11 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 export default function Page() {
   const [records, setRecords] = useState<RentRecord[]>([]);
   const [saving, setSaving] = useState(false);
-  const [savedUrl, setSavedUrl] = useState('');
+  const [savedUrl, setSavedUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showCloudPanel, setShowCloudPanel] = useState(false);
-  const [cloudName, setCloudName] = useState('我的租屋清單');
+  const [cloudName, setCloudName] = useState("我的租屋清單");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const cloudInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,21 +60,7 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const dataParam = params.get("data");
-
-    if (dataParam) {
-      try {
-        const json = decodeURIComponent(atob(dataParam));
-        const shared = JSON.parse(json) as RentRecord[];
-        setRecords(shared);
-        window.history.replaceState({}, "", window.location.pathname);
-      } catch {
-        setRecords(getRecords());
-      }
-    } else {
-      setRecords(getRecords());
-    }
+    setRecords(getRecords());
   }, []);
 
   useEffect(() => {
@@ -64,25 +70,28 @@ export default function Page() {
     }
   }, [showCloudPanel]);
 
-  const handleResults = useCallback((results: unknown[]) => {
-    const merged = addRecords(results as RentRecord[]);
-    setRecords(merged);
-    setSavedUrl('');
-    showToast(`成功分析 ${results.length} 筆租屋資料`);
-  }, [showToast]);
+  const handleResults = useCallback(
+    (results: unknown[]) => {
+      const merged = addRecords(results as RentRecord[]);
+      setRecords(merged);
+      setSavedUrl("");
+      showToast(`成功分析 ${results.length} 筆租屋資料`);
+    },
+    [showToast],
+  );
 
   const handleDelete = useCallback((id: string) => {
     const updated = deleteRecord(id);
     setRecords(updated);
-    setSavedUrl('');
+    setSavedUrl("");
   }, []);
 
   const handleClearAll = useCallback(() => {
     saveRecords([]);
     setRecords([]);
-    setSavedUrl('');
+    setSavedUrl("");
     setShowClearConfirm(false);
-    showToast('已清除全部資料');
+    showToast("已清除全部資料");
   }, [showToast]);
 
   const handleSaveToCloud = useCallback(async () => {
@@ -90,9 +99,9 @@ export default function Page() {
 
     setSaving(true);
     try {
-      const res = await fetch('/api/lists', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: cloudName.trim(), records }),
       });
       const data = await res.json();
@@ -100,10 +109,10 @@ export default function Page() {
         const url = `${window.location.origin}/list/${data.id}`;
         setSavedUrl(url);
         setShowCloudPanel(false);
-        showToast('已儲存到雲端！');
+        showToast("已儲存到雲端！");
       }
     } catch (e) {
-      showToast('儲存失敗，請稍後再試');
+      showToast("儲存失敗，請稍後再試");
       console.error(e);
     } finally {
       setSaving(false);
@@ -113,121 +122,207 @@ export default function Page() {
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(savedUrl);
     setCopied(true);
-    showToast('連結已複製！');
+    showToast("連結已複製！");
     setTimeout(() => setCopied(false), 2000);
   }, [savedUrl, showToast]);
 
   return (
-    <main className="min-h-screen">
-      <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translate(-50%, 12px); }
-          to { opacity: 1; transform: translate(-50%, 0); }
-        }
-      `}</style>
+    <main style={{ minHeight: "100vh" }}>
+      {/* Sticky header */}
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          background: "var(--c-bg)",
+          borderBottom: "1px solid var(--c-border)",
+          height: 56,
+          padding: "0 16px",
+          display: "flex",
+          alignItems: "center",
+          zIndex: 40,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 960,
+            width: "100%",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <img src="/logo.svg" alt="" style={{ width: 24, height: 24 }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--c-text)", letterSpacing: "-0.01em" }}>
+            FB 租屋過濾器
+          </span>
+        </div>
+      </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-16 sm:px-8 lg:px-12">
-        {/* Header */}
-        <header className="mb-16">
-          <div className="flex items-center gap-3 mb-6">
-            <img src="/logo.svg" alt="" className="h-8 w-8" />
-            <span className="text-xs tracking-widest uppercase text-stone-muted font-medium">
-              FB Rent Filter
-            </span>
-          </div>
-          <h1 className="font-serif text-5xl sm:text-6xl font-bold tracking-tight text-charcoal leading-tight">
-            租屋過濾器
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 20px" }}>
+        {/* Hero */}
+        <section style={{ paddingTop: 56, paddingBottom: 40 }}>
+          <h1
+            style={{
+              fontSize: "clamp(36px, 6vw, 52px)",
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: "-0.03em",
+              color: "var(--c-text)",
+            }}
+          >
+            從 FB 貼文
+            <br />
+            <span style={{ color: "var(--c-accent)" }}>找到你的家</span>
           </h1>
-          <p className="mt-4 text-lg text-stone-muted font-light max-w-md">
-            把雜亂的 FB 租屋貼文，變成清晰的比較表格
+          <p style={{ marginTop: 14, fontSize: 16, color: "var(--c-muted)", maxWidth: 360 }}>
+            貼上貼文，AI 幫你整理重點
           </p>
-          <div className="mt-6 w-16 h-px bg-accent" />
-        </header>
+        </section>
 
-        {/* Input */}
-        <section className="mb-12">
+        {/* Input — directly under hero */}
+        <section style={{ paddingBottom: 48 }}>
           <RentInput onResults={handleResults} />
         </section>
 
         {/* Actions bar */}
         {records.length > 0 && (
-          <section className="mb-6 flex flex-wrap items-center gap-3 justify-between border-b border-stone-border pb-6">
-            <div className="flex items-center gap-3 flex-wrap">
-              <ExportBar records={records} onToast={showToast} />
-              <button
-                onClick={() => setShowCloudPanel(true)}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 text-sm bg-charcoal text-warm-white px-4 py-2 hover:bg-charcoal-light disabled:opacity-50 transition-colors font-medium"
+          <section
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 20,
+              paddingBottom: 16,
+              borderBottom: "1px solid var(--c-border)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "var(--c-text)",
+                  fontVariantNumeric: "tabular-nums",
+                }}
               >
-                {saving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Cloud className="h-3.5 w-3.5" />
-                )}
-                儲存到雲端
-              </button>
+                {records.length} 筆結果
+              </span>
+              <ExportBar records={records} onToast={showToast} onCloudSave={() => setShowCloudPanel(true)} />
             </div>
-            {!showClearConfirm ? (
-              <button
-                onClick={() => setShowClearConfirm(true)}
-                className="text-sm text-stone-muted hover:text-red-600 transition-colors"
-              >
-                清除全部
-              </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-red-600">確定要清除？</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {!showClearConfirm ? (
                 <button
-                  onClick={handleClearAll}
-                  className="text-sm text-white bg-red-600 px-3 py-1 hover:bg-red-700 transition-colors"
+                  onClick={() => setShowClearConfirm(true)}
+                  style={{
+                    fontSize: 12,
+                    color: "var(--c-muted)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
                 >
-                  確定
+                  清除全部
                 </button>
-                <button
-                  onClick={() => setShowClearConfirm(false)}
-                  className="text-sm text-stone-muted hover:text-charcoal transition-colors"
-                >
-                  取消
-                </button>
-              </div>
-            )}
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: "#dc2626" }}>確定？</span>
+                  <button
+                    onClick={handleClearAll}
+                    style={{
+                      fontSize: 12,
+                      color: "white",
+                      background: "#dc2626",
+                      border: "none",
+                      padding: "4px 12px",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    確定
+                  </button>
+                  <button
+                    onClick={() => setShowClearConfirm(false)}
+                    style={{
+                      fontSize: 12,
+                      color: "var(--c-muted)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    取消
+                  </button>
+                </div>
+              )}
+            </div>
           </section>
         )}
 
         {/* Cloud save panel */}
         {showCloudPanel && (
-          <div className="mb-6 border border-stone-border p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-charcoal">儲存到雲端並分享</h3>
+          <div
+            style={{
+              marginBottom: 20,
+              border: "1px solid var(--c-border)",
+              borderRadius: 12,
+              padding: 20,
+              background: "var(--c-surface)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--c-text)" }}>儲存到雲端</h3>
               <button
                 onClick={() => setShowCloudPanel(false)}
-                className="text-stone-muted hover:text-charcoal transition-colors"
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--c-muted)", padding: 4 }}
               >
-                <X className="h-4 w-4" />
+                <X style={{ width: 16, height: 16 }} />
               </button>
             </div>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: 8 }}>
               <input
                 ref={cloudInputRef}
                 type="text"
                 value={cloudName}
                 onChange={(e) => setCloudName(e.target.value)}
                 placeholder="清單名稱"
-                className="flex-1 border border-stone-border bg-white px-4 py-2.5 text-sm focus:border-charcoal focus:outline-none transition-colors"
+                style={{
+                  flex: 1,
+                  border: "1px solid var(--c-border)",
+                  borderRadius: 8,
+                  padding: "10px 14px",
+                  fontSize: 14,
+                  outline: "none",
+                  background: "var(--c-bg)",
+                  fontFamily: "inherit",
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveToCloud();
+                  if (e.key === "Enter") handleSaveToCloud();
                 }}
               />
               <button
                 onClick={handleSaveToCloud}
                 disabled={saving || !cloudName.trim()}
-                className="inline-flex items-center gap-1.5 bg-charcoal px-5 py-2.5 text-sm font-medium text-warm-white hover:bg-charcoal-light disabled:opacity-50 transition-colors"
+                style={{
+                  background: "var(--c-accent)",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: saving || !cloudName.trim() ? "not-allowed" : "pointer",
+                  opacity: saving || !cloudName.trim() ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontFamily: "inherit",
+                }}
               >
-                {saving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Cloud className="h-3.5 w-3.5" />
-                )}
+                {saving ? <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} /> : null}
                 儲存
               </button>
             </div>
@@ -236,28 +331,57 @@ export default function Page() {
 
         {/* Saved URL */}
         {savedUrl && (
-          <div className="mb-6 flex items-center gap-2 border border-accent/30 bg-accent/5 px-5 py-3.5">
-            <Check className="h-4 w-4 text-accent shrink-0" />
-            <span className="text-sm text-charcoal truncate flex-1">{savedUrl}</span>
+          <div
+            style={{
+              marginBottom: 20,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              background: "var(--c-accent-light)",
+              border: "1px solid rgba(232,87,42,0.15)",
+              borderRadius: 8,
+              padding: "12px 16px",
+            }}
+          >
+            <Check style={{ width: 16, height: 16, color: "var(--c-accent)", flexShrink: 0 }} />
+            <span
+              style={{
+                fontSize: 13,
+                color: "var(--c-text)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                flex: 1,
+              }}
+            >
+              {savedUrl}
+            </span>
             <button
               onClick={handleCopyUrl}
-              className="text-sm text-accent hover:text-accent-hover font-medium shrink-0 transition-colors"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--c-accent)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                flexShrink: 0,
+                fontFamily: "inherit",
+              }}
             >
-              {copied ? '已複製！' : '複製連結'}
+              {copied ? "已複製！" : "複製連結"}
             </button>
           </div>
         )}
 
-        {/* Table */}
-        <section>
+        {/* Cards */}
+        <section style={{ paddingBottom: 80 }}>
           <RentTable records={records} onDelete={handleDelete} />
         </section>
       </div>
 
       {/* Toast */}
-      {toast && (
-        <Toast message={toast} onClose={() => setToast(null)} />
-      )}
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </main>
   );
 }

@@ -1,14 +1,15 @@
 "use client";
 
-import { Download, Link, FileJson } from "lucide-react";
+import { Download, FileJson, Cloud } from "lucide-react";
 import type { RentRecord } from "@/lib/schema";
 
 interface ExportBarProps {
   records: RentRecord[];
   onToast: (message: string) => void;
+  onCloudSave?: () => void;
 }
 
-export function ExportBar({ records, onToast }: ExportBarProps) {
+export function ExportBar({ records, onToast, onCloudSave }: ExportBarProps) {
   if (records.length === 0) return null;
 
   const downloadFile = (content: string, filename: string, type: string) => {
@@ -23,32 +24,13 @@ export function ExportBar({ records, onToast }: ExportBarProps) {
 
   const exportCSV = () => {
     const headers = [
-      "標題",
-      "月租",
-      "押金",
-      "地區",
-      "地址",
-      "坪數",
-      "房型",
-      "樓層",
-      "特色",
-      "聯絡方式",
-      "可入住時間",
-      "萃取時間",
+      "標題", "月租", "押金", "地區", "地址", "坪數",
+      "房型", "樓層", "特色", "聯絡方式", "可入住時間", "萃取時間",
     ];
     const rows = records.map((r) => [
-      r.title,
-      r.price ?? "",
-      r.deposit ?? "",
-      r.district ?? "",
-      r.address ?? "",
-      r.size ?? "",
-      r.roomType ?? "",
-      r.floor ?? "",
-      r.features.join("、"),
-      r.contact ?? "",
-      r.moveInDate ?? "",
-      r.extractedAt,
+      r.title, r.price ?? "", r.deposit ?? "", r.district ?? "",
+      r.address ?? "", r.size ?? "", r.roomType ?? "", r.floor ?? "",
+      r.features.join("、"), r.contact ?? "", r.moveInDate ?? "", r.extractedAt,
     ]);
 
     const csvEscape = (v: unknown) => {
@@ -75,40 +57,67 @@ export function ExportBar({ records, onToast }: ExportBarProps) {
     onToast("JSON 已下載");
   };
 
-  const copyShareLink = async () => {
-    const data = btoa(encodeURIComponent(JSON.stringify(records)));
-    const url = `${window.location.origin}${window.location.pathname}?data=${data}`;
-    await navigator.clipboard.writeText(url);
-    onToast("分享連結已複製到剪貼簿！");
+  const iconBtnStyle: React.CSSProperties = {
+    width: 32,
+    height: 32,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+    border: "none",
+    background: "transparent",
+    color: "var(--c-muted)",
+    cursor: "pointer",
+    transition: "all 0.15s",
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-medium text-stone-muted tabular-nums">
-        {records.length} 筆
-      </span>
-      <span className="text-stone-border">|</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <button
         onClick={exportCSV}
-        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
+        style={iconBtnStyle}
+        title="下載 CSV"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--c-border)";
+          e.currentTarget.style.color = "var(--c-text)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+          e.currentTarget.style.color = "var(--c-muted)";
+        }}
       >
-        <Download className="h-3.5 w-3.5" />
-        CSV
+        <Download style={{ width: 16, height: 16 }} />
       </button>
       <button
         onClick={exportJSON}
-        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
+        style={iconBtnStyle}
+        title="下載 JSON"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--c-border)";
+          e.currentTarget.style.color = "var(--c-text)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+          e.currentTarget.style.color = "var(--c-muted)";
+        }}
       >
-        <FileJson className="h-3.5 w-3.5" />
-        JSON
+        <FileJson style={{ width: 16, height: 16 }} />
       </button>
-      <button
-        onClick={copyShareLink}
-        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
+      {onCloudSave && <button
+        onClick={onCloudSave}
+        style={iconBtnStyle}
+        title="儲存到雲端"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--c-border)";
+          e.currentTarget.style.color = "var(--c-text)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+          e.currentTarget.style.color = "var(--c-muted)";
+        }}
       >
-        <Link className="h-3.5 w-3.5" />
-        複製連結
-      </button>
+        <Cloud style={{ width: 16, height: 16 }} />
+      </button>}
     </div>
   );
 }

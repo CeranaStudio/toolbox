@@ -11,6 +11,7 @@ export function RentInput({ onResults }: RentInputProps) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
@@ -48,39 +49,72 @@ export function RentInput({ onResults }: RentInputProps) {
   };
 
   return (
-    <div>
-      <label className="block text-xs tracking-widest uppercase text-stone-muted font-medium mb-3">
-        貼上 FB 租屋貼文
-      </label>
+    <div style={{ position: "relative" }}>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={"在這裡貼上 Facebook 租屋社團的貼文內容...\n\n例如：\n「板橋套房出租，近府中捷運站，月租 12000 含水費...」\n\n可以一次貼入多篇貼文，用空白行隔開即可"}
-        className="w-full min-h-[200px] border border-stone-border bg-white p-4 text-sm leading-relaxed placeholder:text-stone-muted/50 focus:border-charcoal focus:outline-none transition-colors resize-y"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleAnalyze();
+          }
+        }}
+        placeholder={"貼上 Facebook 租屋社團的貼文...\n\n可以一次貼入多篇，用空白行隔開"}
         disabled={loading}
+        style={{
+          width: "100%",
+          minHeight: 180,
+          border: "none",
+          borderBottom: `2px solid ${focused ? "var(--c-accent)" : "var(--c-border)"}`,
+          background: "transparent",
+          padding: "16px 0",
+          paddingRight: 120,
+          fontSize: 15,
+          lineHeight: 1.7,
+          outline: "none",
+          resize: "none",
+          transition: "border-color 0.2s",
+          color: "var(--c-text)",
+          fontFamily: "inherit",
+        }}
       />
-      <p className="mt-2 text-xs text-stone-muted">
-        可一次貼入多篇貼文，用空白行隔開
-      </p>
+      <button
+        onClick={handleAnalyze}
+        disabled={loading || !text.trim()}
+        style={{
+          position: "absolute",
+          bottom: 12,
+          right: 0,
+          background: loading || !text.trim() ? "var(--c-muted)" : "var(--c-accent)",
+          color: "white",
+          padding: "8px 20px",
+          borderRadius: 20,
+          fontSize: 14,
+          fontWeight: 500,
+          border: "none",
+          cursor: loading || !text.trim() ? "not-allowed" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          opacity: loading || !text.trim() ? 0.5 : 1,
+          transition: "all 0.2s",
+          fontFamily: "inherit",
+        }}
+      >
+        {loading ? (
+          <>
+            <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+            分析中
+          </>
+        ) : (
+          "開始分析"
+        )}
+      </button>
       {error && (
-        <p className="mt-3 text-sm text-red-600">{error}</p>
+        <p style={{ marginTop: 12, fontSize: 14, color: "#dc2626" }}>{error}</p>
       )}
-      <div className="mt-4">
-        <button
-          onClick={handleAnalyze}
-          disabled={loading || !text.trim()}
-          className="inline-flex items-center gap-2 bg-charcoal px-8 py-3 text-sm font-medium text-warm-white hover:bg-charcoal-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              分析中...
-            </>
-          ) : (
-            "開始分析"
-          )}
-        </button>
-      </div>
     </div>
   );
 }

@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { Loader2, ArrowRight } from 'lucide-react';
-import { RentRecord } from '@/lib/schema';
+import { RentInput } from '@/components/RentInput';
+import { RentTable } from '@/components/RentTable';
+import { ExportBar } from '@/components/ExportBar';
+import type { RentRecord } from '@/lib/schema';
 
 interface SharedList {
   id: string;
@@ -18,164 +20,138 @@ export default function SharedListPage() {
   const [list, setList] = useState<SharedList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const fetchList = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/lists/${id}`);
+      const data = await res.json();
+      if (data.error) setError(data.error);
+      else setList(data);
+    } catch {
+      setError('載入失敗');
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    fetch(`/api/lists/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) setError(data.error);
-        else setList(data);
-      })
-      .catch(() => setError('載入失敗'))
-      .finally(() => setLoading(false));
-  }, [id]);
+    fetchList();
+  }, [fetchList]);
+
+  // 新分析的結果 append 進 D1 同一個 list
+  const handleResults = useCallback(async (results: unknown[]) => {
+    const newRecords = results as RentRecord[];
+    try {
+      const res = await fetch(`/api/lists/${id}/records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ records: newRecords }),
+      });
+      if (res.ok) {
+        showToast(`新增 ${newRecords.length} 筆，已加入清單`);
+        // 重新 fetch 最新資料
+        await fetchList();
+      } else {
+        showToast('新增失敗，請再試一次');
+      }
+    } catch {
+      showToast('網路錯誤');
+    }
+  }, [id, fetchList, showToast]);
+
+  const handleDelete = useCallback(async (recordId: string) => {
+    // 從本地 state 移除（樂觀更新）
+    setList((prev) =>
+      prev ? { ...prev, records: prev.records.filter((r) => r.id !== recordId) } : prev
+    );
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-stone-muted bg-warm-white">
-        <Loader2 className="h-6 w-6 animate-spin text-accent mb-3" />
-        <p className="text-sm">載入中...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: 'var(--c-muted)', fontSize: '14px' }}>載入中...</div>
       </div>
     );
   }
 
   if (error || !list) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-warm-white">
-        <p className="font-serif text-2xl text-charcoal/30 italic mb-2">
-          {error || '找不到清單'}
-        </p>
-        <a
-          href="/"
-          className="mt-4 text-sm text-accent hover:text-accent-hover transition-colors"
-        >
-          回到首頁
-        </a>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#e53e3e', fontSize: '14px' }}>{error || '找不到清單'}</div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-warm-white py-16 px-6">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <header className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <img src="/logo.svg" alt="" className="h-7 w-7" />
-            <span className="text-xs tracking-widest uppercase text-stone-muted font-medium">
-              FB Rent Filter
-            </span>
-          </div>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-charcoal leading-tight">
+    <main style={{ minHeight: '100vh', background: 'var(--c-bg)' }}>
+      {/* Navbar */}
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 10,
+        background: 'var(--c-bg)',
+        borderBottom: '1px solid var(--c-border)',
+        padding: '0 24px', height: '56px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+          <img src="/logo.svg" alt="" style={{ width: '24px', height: '24px' }} />
+          <span style={{ fontSize: '13px', color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
+        </a>
+      </nav>
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 24px 80px' }}>
+        {/* List header */}
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--c-text)', marginBottom: '6px' }}>
             {list.name}
           </h1>
-          <p className="text-sm text-stone-muted mt-3">
-            {list.records.length} 筆 · 分享於{' '}
-            {new Date(list.created_at).toLocaleDateString('zh-TW', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+          <p style={{ fontSize: '13px', color: 'var(--c-muted)' }}>
+            共 {list.records.length} 筆 · {new Date(list.created_at).toLocaleDateString('zh-TW')}
           </p>
-          <div className="mt-6 w-16 h-px bg-accent" />
-        </header>
+        </div>
+
+        {/* Append input */}
+        <div style={{
+          background: 'var(--c-surface)',
+          border: '1px solid var(--c-border)',
+          borderRadius: '12px',
+          padding: '20px',
+          marginBottom: '32px',
+        }}>
+          <p style={{ fontSize: '12px', color: 'var(--c-muted)', marginBottom: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            繼續新增貼文到這個清單
+          </p>
+          <RentInput onResults={handleResults} />
+        </div>
 
         {/* Records */}
-        <div className="divide-y divide-stone-border">
-          {list.records.map((r) => (
-            <article
-              key={r.id}
-              className="py-6 first:pt-0"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="font-medium text-charcoal text-base">
-                  {r.title || '（無標題）'}
-                </h2>
-                {r.price != null && (
-                  <span className="text-accent font-bold text-lg whitespace-nowrap tabular-nums">
-                    ${r.price.toLocaleString()}
-                    <span className="text-xs font-light text-stone-muted"> /月</span>
-                  </span>
-                )}
-              </div>
+        {list.records.length > 0 && (
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '13px', color: 'var(--c-muted)' }}>{list.records.length} 筆租屋資料</span>
+            <ExportBar records={list.records} onToast={showToast} />
+          </div>
+        )}
 
-              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-sm">
-                {r.district && (
-                  <div>
-                    <span className="text-stone-muted text-xs">地區</span>
-                    <p className="text-charcoal/80">{r.district}</p>
-                  </div>
-                )}
-                {r.address && (
-                  <div>
-                    <span className="text-stone-muted text-xs">地址</span>
-                    <p className="text-charcoal/80">{r.address}</p>
-                  </div>
-                )}
-                {r.size != null && (
-                  <div>
-                    <span className="text-stone-muted text-xs">坪數</span>
-                    <p className="text-charcoal/80">{r.size} 坪</p>
-                  </div>
-                )}
-                {r.roomType && (
-                  <div>
-                    <span className="text-stone-muted text-xs">房型</span>
-                    <p className="text-charcoal/80">{r.roomType}</p>
-                  </div>
-                )}
-                {r.floor && (
-                  <div>
-                    <span className="text-stone-muted text-xs">樓層</span>
-                    <p className="text-charcoal/80">{r.floor}</p>
-                  </div>
-                )}
-                {r.moveInDate && (
-                  <div>
-                    <span className="text-stone-muted text-xs">入住時間</span>
-                    <p className="text-charcoal/80">{r.moveInDate}</p>
-                  </div>
-                )}
-                {r.contact && (
-                  <div>
-                    <span className="text-stone-muted text-xs">聯絡</span>
-                    <p className="text-charcoal/80">{r.contact}</p>
-                  </div>
-                )}
-                {r.deposit && (
-                  <div>
-                    <span className="text-stone-muted text-xs">押金</span>
-                    <p className="text-charcoal/80">{r.deposit}</p>
-                  </div>
-                )}
-              </div>
-
-              {r.features && r.features.length > 0 && (
-                <p className="mt-3 text-xs text-charcoal/50">
-                  {r.features.join(" · ")}
-                </p>
-              )}
-
-              {r.originalText && (
-                <p className="mt-3 text-xs text-stone-muted/70 line-clamp-2 leading-relaxed">
-                  {r.originalText}
-                </p>
-              )}
-            </article>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div className="mt-16 pt-8 border-t border-stone-border">
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 bg-charcoal px-6 py-3 text-sm font-medium text-warm-white hover:bg-charcoal-light transition-colors"
-          >
-            用 FB 租屋過濾器分析你的貼文
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
+        <RentTable records={list.records} onDelete={handleDelete} />
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+          background: 'var(--c-text)', color: 'white',
+          padding: '10px 20px', borderRadius: '8px',
+          fontSize: '13px', zIndex: 50,
+          animation: 'slideUp 0.2s ease-out',
+        }}>
+          {toast}
+        </div>
+      )}
     </main>
   );
 }
