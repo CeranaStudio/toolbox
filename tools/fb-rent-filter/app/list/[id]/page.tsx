@@ -75,7 +75,6 @@ export default function SharedListPage() {
         body: JSON.stringify({ name: trimmed }),
       });
     } catch {
-      // revert on failure
       setList((prev) => prev ? { ...prev, name: list.name } : prev);
       setNameValue(list.name);
     }
@@ -170,7 +169,7 @@ export default function SharedListPage() {
         position: 'sticky', top: 0, zIndex: 10,
         background: 'var(--c-bg)',
         borderBottom: '1px solid var(--c-border)',
-        padding: '0 24px', height: '56px',
+        padding: '0 max(16px, env(safe-area-inset-left))', height: '56px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
@@ -185,23 +184,24 @@ export default function SharedListPage() {
             gap: 6,
             background: 'none',
             border: '1px solid var(--c-border)',
-            borderRadius: 8,
-            padding: '6px 14px',
+            borderRadius: 'var(--radius-sm)',
+            padding: '8px 12px',
             fontSize: 13,
             fontWeight: 500,
             color: 'var(--c-text)',
             cursor: 'pointer',
             fontFamily: 'inherit',
+            touchAction: 'manipulation',
           }}
         >
           <LinkIcon style={{ width: 14, height: 14 }} />
-          複製分享連結
+          <span className="desktop-only">複製分享連結</span>
         </button>
       </nav>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(16px, 4vw, 24px) 80px' }}>
         {/* List header */}
-        <div style={{ marginBottom: '32px' }}>
+        <div style={{ marginBottom: '28px' }}>
           {editingName ? (
             <input
               ref={nameInputRef}
@@ -216,7 +216,7 @@ export default function SharedListPage() {
                 }
               }}
               style={{
-                fontSize: '28px',
+                fontSize: '22px',
                 fontWeight: 700,
                 color: 'var(--c-text)',
                 background: 'transparent',
@@ -233,7 +233,7 @@ export default function SharedListPage() {
             <h1
               onClick={() => setEditingName(true)}
               style={{
-                fontSize: '28px',
+                fontSize: '22px',
                 fontWeight: 700,
                 color: 'var(--c-text)',
                 marginBottom: '6px',
@@ -246,7 +246,7 @@ export default function SharedListPage() {
               {list.name}
             </h1>
           )}
-          <p style={{ fontSize: '13px', color: 'var(--c-muted)' }}>
+          <p style={{ fontSize: '12px', color: 'var(--c-muted)' }}>
             {new Date(list.created_at).toLocaleDateString('zh-TW')}
           </p>
         </div>
@@ -254,30 +254,21 @@ export default function SharedListPage() {
         {/* Append input */}
         {atLimit ? (
           <div style={{
-            background: '#FEF2F2',
-            border: '1px solid #FECACA',
-            borderRadius: 12,
-            padding: '20px',
-            marginBottom: '24px',
-            textAlign: 'center',
+            borderLeft: '3px solid var(--c-accent)',
+            paddingLeft: 12,
+            marginBottom: '20px',
           }}>
-            <p style={{ fontSize: 14, color: '#dc2626', fontWeight: 600, marginBottom: 6 }}>
+            <p style={{ fontSize: 14, color: 'var(--c-text)', fontWeight: 600, marginBottom: 4 }}>
               已達上限（{recordCount}/{RECORD_LIMIT}）
             </p>
-            <p style={{ fontSize: 13, color: '#d97706' }}>
+            <p style={{ fontSize: 13, color: 'var(--c-muted)' }}>
               升級解鎖更多空間 →
             </p>
           </div>
         ) : (
-          <div style={{
-            background: 'var(--c-surface)',
-            border: '1px solid var(--c-border)',
-            borderRadius: '12px',
-            padding: '20px',
-            marginBottom: '24px',
-          }}>
+          <div style={{ marginBottom: '20px' }}>
             <p style={{ fontSize: '12px', color: 'var(--c-muted)', marginBottom: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              繼續新增貼文到這個清單
+              繼續新增
             </p>
             <RentInput onResults={handleResults} />
           </div>
@@ -292,7 +283,7 @@ export default function SharedListPage() {
         }}>
           <span style={{
             fontSize: 13,
-            fontWeight: 600,
+            fontWeight: 500,
             color: countColor,
             fontVariantNumeric: 'tabular-nums',
           }}>
@@ -328,7 +319,7 @@ export default function SharedListPage() {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: 'var(--c-text)', color: 'var(--c-bg)',
-            padding: '10px 20px', borderRadius: 8,
+            padding: '10px 20px', borderRadius: 'var(--radius-sm)',
             fontSize: 13,
           }}>
             <Check style={{ width: 16, height: 16, color: 'var(--c-accent)', flexShrink: 0 }} />

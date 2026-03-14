@@ -47,13 +47,13 @@ export async function POST(request: NextRequest) {
             .run();
 
           const obj = JSON.parse(cached.structured_result);
-          return { ...obj, id: crypto.randomUUID(), extractedAt: new Date().toISOString() };
+          return { ...obj, id: crypto.randomUUID(), extractedAt: new Date().toISOString(), status: "interested" as const, notes: null };
         }
 
         // 未命中：呼叫 OpenAI
         const { object } = await generateObject({
           model: openai("gpt-5-mini"),
-          schema: rentRecordSchema.omit({ extractedAt: true }),
+          schema: rentRecordSchema.omit({ extractedAt: true, status: true, notes: true }),
           prompt: `你是一個台灣租屋資訊萃取助手。請從以下 Facebook 租屋社團貼文中萃取結構化的租屋資料。
 如果某個欄位在貼文中找不到，就設為 null。
 features 欄位請萃取所有值得注意的特色，如：近捷運、附冷氣、附家具、可養寵物、有陽台等。
@@ -76,6 +76,8 @@ ${post}`,
           ...object,
           extractedAt: new Date().toISOString(),
           id: crypto.randomUUID(),
+          status: "interested" as const,
+          notes: null,
         };
       }),
     );

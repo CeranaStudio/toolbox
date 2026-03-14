@@ -58,17 +58,18 @@ export function ExportBar({ records, onToast, onCloudSave }: ExportBarProps) {
   };
 
   const iconBtnStyle: React.CSSProperties = {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 6,
+    borderRadius: "var(--radius-sm)",
     border: "none",
     background: "transparent",
     color: "var(--c-muted)",
     cursor: "pointer",
     transition: "all 0.15s",
+    touchAction: "manipulation",
   };
 
   return (

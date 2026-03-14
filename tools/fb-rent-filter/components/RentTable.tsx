@@ -85,78 +85,103 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
 
   return (
     <div>
-      {/* Filter bar */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        {(["all", ...STATUS_ORDER] as const).map((key) => {
-          const isActive = filterStatus === key;
-          const label = key === "all" ? "全部" : STATUS_CONFIG[key].label;
-          return (
-            <button
-              key={key}
-              onClick={() => setFilterStatus(key)}
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                padding: "6px 16px",
-                borderRadius: 20,
-                border: "1px solid var(--c-border)",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                background: isActive ? "var(--c-text)" : "transparent",
-                color: isActive ? "white" : "var(--c-muted)",
-                transition: "all 0.15s",
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Filter bar + Sort controls merged */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 16,
+        gap: 12,
+      }}>
+        {/* Filter pills - scrollable */}
+        <div style={{
+          display: "flex",
+          gap: 6,
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          flexShrink: 1,
+          minWidth: 0,
+          scrollbarWidth: "none",
+        }}>
+          {(["all", ...STATUS_ORDER] as const).map((key) => {
+            const isActive = filterStatus === key;
+            const label = key === "all" ? "全部" : STATUS_CONFIG[key].label;
+            return (
+              <button
+                key={key}
+                onClick={() => setFilterStatus(key)}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  height: 32,
+                  padding: "0 14px",
+                  borderRadius: 16,
+                  border: "1px solid var(--c-border)",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  background: isActive ? "var(--c-text)" : "transparent",
+                  color: isActive ? "white" : "var(--c-muted)",
+                  transition: "all 0.15s",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                  touchAction: "manipulation",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
 
-      {/* Sort controls */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        <button
-          onClick={() => handleSort("price")}
-          style={{
-            fontSize: 12,
-            color: sortKey === "price" ? "var(--c-accent)" : "var(--c-muted)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            fontFamily: "inherit",
-            fontWeight: sortKey === "price" ? 600 : 400,
-          }}
-        >
-          月租 <ArrowUpDown style={{ width: 12, height: 12 }} />
-        </button>
-        <button
-          onClick={() => handleSort("size")}
-          style={{
-            fontSize: 12,
-            color: sortKey === "size" ? "var(--c-accent)" : "var(--c-muted)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            fontFamily: "inherit",
-            fontWeight: sortKey === "size" ? 600 : 400,
-          }}
-        >
-          坪數 <ArrowUpDown style={{ width: 12, height: 12 }} />
-        </button>
+        {/* Sort controls */}
+        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+          <button
+            onClick={() => handleSort("price")}
+            style={{
+              fontSize: 12,
+              color: sortKey === "price" ? "var(--c-accent)" : "var(--c-muted)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+              fontFamily: "inherit",
+              fontWeight: sortKey === "price" ? 600 : 400,
+              whiteSpace: "nowrap",
+              touchAction: "manipulation",
+            }}
+          >
+            月租 <ArrowUpDown style={{ width: 12, height: 12 }} />
+          </button>
+          <button
+            onClick={() => handleSort("size")}
+            style={{
+              fontSize: 12,
+              color: sortKey === "size" ? "var(--c-accent)" : "var(--c-muted)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+              fontFamily: "inherit",
+              fontWeight: sortKey === "size" ? 600 : 400,
+              whiteSpace: "nowrap",
+              touchAction: "manipulation",
+            }}
+          >
+            坪數 <ArrowUpDown style={{ width: 12, height: 12 }} />
+          </button>
+        </div>
       </div>
 
       {/* Card grid */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-          gap: 16,
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+          gap: 12,
         }}
       >
         {sorted.map((r, i) => {
@@ -168,29 +193,34 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
               style={{
                 background: "var(--c-surface)",
                 border: "1px solid var(--c-border)",
-                borderRadius: 12,
-                padding: 20,
-                position: "relative",
-                overflow: "hidden",
-                animation: `fadeIn 0.3s ease-out ${i * 0.04}s both`,
+                borderRadius: "var(--radius-md)",
+                padding: 16,
+                animation: `fadeSlide 0.25s ease-out ${i * 0.04}s both`,
               }}
               className="rent-card"
             >
-              {/* Top-right: status badge + delete button */}
-              <div style={{ position: "absolute", top: 12, right: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              {/* Row 1: status badge + delete */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 12,
+              }}>
                 <button
                   onClick={() => cycleStatus(r)}
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 600,
-                    padding: "3px 10px",
-                    borderRadius: 20,
+                    height: 24,
+                    padding: "0 10px",
+                    borderRadius: 12,
                     border: "none",
                     cursor: "pointer",
                     background: cfg.color,
                     color: "white",
                     fontFamily: "inherit",
-                    lineHeight: 1.4,
+                    lineHeight: 1,
+                    touchAction: "manipulation",
                   }}
                   title="點擊切換狀態"
                 >
@@ -205,13 +235,13 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderRadius: 6,
+                    borderRadius: "var(--radius-sm)",
                     border: "none",
                     background: "transparent",
                     color: "var(--c-muted)",
                     cursor: "pointer",
-                    opacity: 0,
                     transition: "all 0.15s",
+                    touchAction: "manipulation",
                   }}
                   title="刪除"
                 >
@@ -219,13 +249,13 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 </button>
               </div>
 
-              {/* Top: Price + District */}
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12, paddingRight: 100 }}>
+              {/* Row 2: Price + District */}
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
                 <div>
                   {r.price != null ? (
-                    <span style={{ fontSize: 22, fontWeight: 700, color: "var(--c-accent)", fontVariantNumeric: "tabular-nums" }}>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: "var(--c-accent)", fontVariantNumeric: "tabular-nums" }}>
                       ${r.price.toLocaleString()}
-                      <span style={{ fontSize: 13, fontWeight: 400, color: "var(--c-muted)", marginLeft: 2 }}>/月</span>
+                      <span style={{ fontSize: 12, fontWeight: 400, color: "var(--c-muted)", marginLeft: 2 }}>/月</span>
                     </span>
                   ) : (
                     <span style={{ fontSize: 18, color: "var(--c-muted)" }}>價格未知</span>
@@ -234,12 +264,12 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 {r.district && (
                   <span
                     style={{
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: 500,
                       color: "var(--c-accent)",
                       background: "var(--c-accent-light)",
                       padding: "3px 10px",
-                      borderRadius: 20,
+                      borderRadius: 12,
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -248,13 +278,13 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 )}
               </div>
 
-              {/* Title */}
+              {/* Row 3: Title */}
               <p
                 style={{
                   fontSize: 14,
                   fontWeight: 500,
                   color: "var(--c-text)",
-                  marginBottom: 10,
+                  marginBottom: 6,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -263,8 +293,8 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 {r.title}
               </p>
 
-              {/* Pill list: roomType · size · floor */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 14 }}>
+              {/* Row 4: roomType · size · floor */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
                 {[r.roomType, r.size != null ? `${r.size} 坪` : null, r.floor].filter(Boolean).map((item, idx) => (
                   <span
                     key={idx}
@@ -282,7 +312,7 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
 
               {/* Feature tags */}
               {r.features.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
                   {r.features.slice(0, 3).map((f, idx) => (
                     <span
                       key={idx}
@@ -291,7 +321,7 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                         color: "var(--c-text)",
                         background: "var(--c-bg)",
                         padding: "3px 10px",
-                        borderRadius: 20,
+                        borderRadius: 12,
                         fontWeight: 400,
                       }}
                     >
@@ -304,7 +334,7 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                         fontSize: 11,
                         color: "var(--c-muted)",
                         padding: "3px 10px",
-                        borderRadius: 20,
+                        borderRadius: 12,
                         background: "var(--c-bg)",
                       }}
                     >
@@ -337,7 +367,9 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                       alignItems: "center",
                       gap: 2,
                       fontFamily: "inherit",
-                      padding: 0,
+                      padding: "4px 0",
+                      minHeight: 36,
+                      touchAction: "manipulation",
                     }}
                   >
                     {expandedId === r.id ? (
@@ -353,8 +385,8 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
               {expandedId === r.id && r.originalText && (
                 <div
                   style={{
-                    marginTop: 14,
-                    paddingTop: 14,
+                    marginTop: 12,
+                    paddingTop: 12,
                     borderTop: "1px solid var(--c-border)",
                     fontSize: 12,
                     lineHeight: 1.7,
@@ -383,10 +415,15 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
         })}
       </div>
 
-      {/* Hover styles via CSS */}
+      {/* Mobile: delete always visible. Desktop: hover only */}
       <style>{`
-        .rent-card:hover .rent-card-delete {
-          opacity: 1 !important;
+        @media (min-width: 769px) {
+          .rent-card .rent-card-delete {
+            opacity: 0;
+          }
+          .rent-card:hover .rent-card-delete {
+            opacity: 1 !important;
+          }
         }
         .rent-card-delete:hover {
           color: #dc2626 !important;
@@ -461,7 +498,7 @@ function NotesField({
             color: "var(--c-text)",
             background: "var(--c-bg)",
             border: "1px solid var(--c-border)",
-            borderRadius: 8,
+            borderRadius: "var(--radius-sm)",
             padding: "8px 12px",
             resize: "none",
             overflow: "hidden",
@@ -493,7 +530,7 @@ function NotesField({
             margin: 0,
             padding: "6px 12px",
             border: "1px dashed var(--c-border)",
-            borderRadius: 8,
+            borderRadius: "var(--radius-sm)",
             textAlign: "center",
             opacity: 0.6,
           }}

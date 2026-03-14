@@ -38,7 +38,7 @@ export default function Page() {
           background: "var(--c-bg)",
           borderBottom: "1px solid var(--c-border)",
           height: 56,
-          padding: "0 16px",
+          padding: "0 max(16px, env(safe-area-inset-left))",
           display: "flex",
           alignItems: "center",
           zIndex: 40,
@@ -61,14 +61,14 @@ export default function Page() {
         </div>
       </header>
 
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 20px" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 max(16px, env(safe-area-inset-left))" }}>
         {/* Hero */}
-        <section style={{ paddingTop: 56, paddingBottom: 40 }}>
+        <section style={{ paddingTop: "min(60px, 8vh)", paddingBottom: 32 }}>
           <h1
             style={{
-              fontSize: "clamp(36px, 6vw, 52px)",
+              fontSize: "clamp(32px, 8vw, 56px)",
               fontWeight: 700,
-              lineHeight: 1.15,
+              lineHeight: 1.1,
               letterSpacing: "-0.03em",
               color: "var(--c-text)",
             }}
@@ -77,9 +77,14 @@ export default function Page() {
             <br />
             <span style={{ color: "var(--c-accent)" }}>找到你的家</span>
           </h1>
-          <p style={{ marginTop: 14, fontSize: 16, color: "var(--c-muted)", maxWidth: 420 }}>
+          <p style={{ marginTop: 14, fontSize: 16, color: "var(--c-muted)", maxWidth: 340 }}>
             貼上貼文，AI 自動整理重點，建立你的專屬清單
           </p>
+          <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap" }}>
+            {["📋 AI 自動整理", "🔗 一鍵分享", "👥 多人協作"].map((hint) => (
+              <span key={hint} style={{ fontSize: 12, color: "var(--c-muted)" }}>{hint}</span>
+            ))}
+          </div>
         </section>
 
         {/* Input */}
@@ -102,7 +107,7 @@ export default function Page() {
           ) : (
             <>
               <RentInput onResults={handleResults} loadingText="AI 分析中，建立清單..." />
-              <p style={{ marginTop: 12, fontSize: 13, color: "var(--c-muted)" }}>
+              <p style={{ marginTop: 10, fontSize: 12, color: "var(--c-muted)" }}>
                 分析後會自動建立清單，可分享給朋友一起整理
               </p>
             </>

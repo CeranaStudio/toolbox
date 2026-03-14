@@ -62,19 +62,20 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
         disabled={loading}
         style={{
           width: "100%",
-          minHeight: 180,
-          border: "none",
-          borderBottom: `2px solid ${focused ? "var(--c-accent)" : "var(--c-border)"}`,
-          background: "transparent",
-          padding: "16px 0",
-          paddingRight: 120,
+          minHeight: 120,
+          border: `1px solid ${focused ? "var(--c-accent)" : "var(--c-border)"}`,
+          borderRadius: "var(--radius-lg)",
+          background: "var(--c-surface)",
+          padding: "16px",
+          paddingBottom: 56,
           fontSize: 15,
           lineHeight: 1.7,
           outline: "none",
           resize: "none",
-          transition: "border-color 0.2s",
+          transition: "border-color 0.15s, box-shadow 0.15s",
           color: "var(--c-text)",
           fontFamily: "inherit",
+          boxShadow: focused ? "0 0 0 3px var(--c-accent-light)" : "none",
         }}
       />
       <button
@@ -83,10 +84,12 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
         style={{
           position: "absolute",
           bottom: 12,
-          right: 0,
+          right: 12,
+          height: 40,
+          minWidth: 80,
           background: loading || !text.trim() ? "var(--c-muted)" : "var(--c-accent)",
           color: "white",
-          padding: "8px 20px",
+          padding: "0 20px",
           borderRadius: 20,
           fontSize: 14,
           fontWeight: 500,
@@ -94,10 +97,12 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
           cursor: loading || !text.trim() ? "not-allowed" : "pointer",
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           gap: 6,
           opacity: loading || !text.trim() ? 0.5 : 1,
           transition: "all 0.2s",
           fontFamily: "inherit",
+          touchAction: "manipulation",
         }}
       >
         {loading ? (

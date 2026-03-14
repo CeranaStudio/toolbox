@@ -20,7 +20,7 @@ export const rentRecordSchema = z.object({
   status: z
     .enum(["interested", "contacted", "visited", "rejected"])
     .default("interested"),
-  notes: z.string().optional().nullable(),
+  notes: z.string().nullable().describe("備註，沒有就 null"),
 });
 
 export type RentRecord = z.infer<typeof rentRecordSchema> & { id: string };

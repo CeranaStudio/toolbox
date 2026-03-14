@@ -1,29 +1,49 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --c-bg: #F7F6F3;
+    --c-bg: #FAFAF8;
     --c-surface: #FFFFFF;
-    --c-border: rgba(0,0,0,0.08);
-    --c-text: #111111;
-    --c-muted: #777777;
+    --c-border: #E8E6E0;
+    --c-text: #1A1A18;
+    --c-muted: #888882;
     --c-accent: #E8572A;
-    --c-accent-light: #FFF1ED;
+    --c-accent-light: #FFF0EA;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+  * {
+    box-sizing: border-box;
   }
   body {
     background: var(--c-bg);
     color: var(--c-text);
-    font-family: "DM Sans", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (max-width: 480px) {
+  .desktop-only {
+    display: none !important;
   }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translate(-50%, 12px); }
+  from { opacity: 0; transform: translate(-50%, 10px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
