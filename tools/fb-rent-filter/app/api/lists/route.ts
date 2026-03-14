@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export const runtime = 'nodejs';
 
 // POST /api/lists — 建立新清單並存入 records
 export async function POST(req: NextRequest) {
-  const { env } = getRequestContext();
-  const db = env.fb_rent_filter_db;
+  const { env } = await getCloudflareContext({ async: true });
+  const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
 
   const body = await req.json();
   const { name, records } = body as {

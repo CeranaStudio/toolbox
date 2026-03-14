@@ -11,23 +11,24 @@
     "cf-typegen": "npx wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "ai": "^4.0.0",
+    "esbuild": "^0.27.4",
+    "lucide-react": "^0.400.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "ai": "^4.0.0",
-    "@ai-sdk/openai": "^1.0.0",
-    "zod": "^3.23.0",
-    "lucide-react": "^0.400.0",
-    "@radix-ui/react-slot": "^1.1.0"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
+    "@opennextjs/cloudflare": "^1.17.1",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
     "tailwindcss": "^4.0.0",
-    "@opennextjs/cloudflare": "^1.0.0",
+    "typescript": "^5.5.0",
     "wrangler": "^4.0.0"
   }
 }

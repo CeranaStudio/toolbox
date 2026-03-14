@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRequestContext } from '@cloudflare/next-on-pages';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export const runtime = 'nodejs';
 
@@ -8,8 +8,8 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { env } = getRequestContext();
-  const db = env.fb_rent_filter_db;
+  const { env } = await getCloudflareContext({ async: true });
+  const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
   const { id } = await params;
 
   const list = await db
@@ -52,8 +52,8 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { env } = getRequestContext();
-  const db = env.fb_rent_filter_db;
+  const { env } = await getCloudflareContext({ async: true });
+  const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
   const { id } = await params;
 
   await db.prepare('DELETE FROM lists WHERE id = ?').bind(id).run();
