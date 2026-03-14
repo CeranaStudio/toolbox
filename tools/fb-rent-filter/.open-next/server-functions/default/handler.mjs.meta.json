@@ -3568,7 +3568,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/116.js": {
-      "bytes": 13290,
+      "bytes": 13176,
       "imports": [],
       "format": "cjs"
     },
@@ -4482,8 +4482,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/lists/route.js": {
-      "bytes": 8838,
+    ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js": {
+      "bytes": 8896,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -4523,7 +4523,7 @@
         {
           "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
           "kind": "require-call",
-          "original": "../../../webpack-runtime.js"
+          "original": "../../../../webpack-runtime.js"
         }
       ],
       "format": "cjs"
@@ -4574,8 +4574,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js": {
-      "bytes": 8896,
+    ".open-next/server-functions/default/.next/server/app/api/lists/route.js": {
+      "bytes": 8838,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -4615,7 +4615,7 @@
         {
           "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
           "kind": "require-call",
-          "original": "../../../../webpack-runtime.js"
+          "original": "../../../webpack-runtime.js"
         }
       ],
       "format": "cjs"
@@ -4826,9 +4826,9 @@
           "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/analyze/route.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/lists/route.js",
+          "path": ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js",
           "kind": "require-call",
-          "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/lists/route.js"
+          "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/api/lists/[id]/records/route.js",
@@ -4836,9 +4836,9 @@
           "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/lists/[id]/records/route.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js",
+          "path": ".open-next/server-functions/default/.next/server/app/api/lists/route.js",
           "kind": "require-call",
-          "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js"
+          "original": "/private/tmp/toolbox-work/tools/fb-rent-filter/.open-next/server-functions/default/.next/server/app/api/lists/route.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/list/[id]/page.js",
@@ -6855,7 +6855,7 @@
           "bytesInOutput": 194
         },
         ".open-next/server-functions/default/.next/server/chunks/116.js": {
-          "bytesInOutput": 14046
+          "bytesInOutput": 13892
         },
         ".open-next/server-functions/default/.next/server/chunks/548.js": {
           "bytesInOutput": 71627
@@ -6965,14 +6965,14 @@
         ".open-next/server-functions/default/.next/server/app/api/analyze/route.js": {
           "bytesInOutput": 204831
         },
-        ".open-next/server-functions/default/.next/server/app/api/lists/route.js": {
-          "bytesInOutput": 9004
+        ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js": {
+          "bytesInOutput": 9085
         },
         ".open-next/server-functions/default/.next/server/app/api/lists/[id]/records/route.js": {
           "bytesInOutput": 9171
         },
-        ".open-next/server-functions/default/.next/server/app/api/lists/[id]/route.js": {
-          "bytesInOutput": 9085
+        ".open-next/server-functions/default/.next/server/app/api/lists/route.js": {
+          "bytesInOutput": 9004
         },
         ".open-next/server-functions/default/.next/server/app/list/[id]/page.js": {
           "bytesInOutput": 19345
@@ -7086,7 +7086,7 @@
           "bytesInOutput": 56117
         }
       },
-      "bytes": 2791902
+      "bytes": 2791748
     }
   }
 }

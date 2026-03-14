@@ -14,14 +14,8 @@ export function RentInput({ onResults }: RentInputProps) {
   const [focused, setFocused] = useState(false);
 
   const handleAnalyze = async () => {
-    if (!text.trim()) return;
-
-    const posts = text
-      .split(/\n{2,}/)
-      .map((p) => p.trim())
-      .filter(Boolean);
-
-    if (posts.length === 0) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
 
     setLoading(true);
     setError(null);
@@ -30,7 +24,7 @@ export function RentInput({ onResults }: RentInputProps) {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ posts }),
+        body: JSON.stringify({ posts: [trimmed] }),
       });
 
       if (!res.ok) {
@@ -61,7 +55,7 @@ export function RentInput({ onResults }: RentInputProps) {
             handleAnalyze();
           }
         }}
-        placeholder={"貼上 Facebook 租屋社團的貼文...\n\n可以一次貼入多篇，用空白行隔開"}
+        placeholder={"貼上一篇 Facebook 租屋社團的貼文..."}
         disabled={loading}
         style={{
           width: "100%",
