@@ -49,6 +49,24 @@ export async function GET(
   return NextResponse.json({ ...list, records });
 }
 
+// PATCH /api/lists/[id] — 更新清單名稱
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { env } = await getCloudflareContext({ async: true });
+  const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
+  const { id } = await params;
+  const { name } = await req.json();
+
+  if (!name || typeof name !== 'string') {
+    return NextResponse.json({ error: '名稱不可為空' }, { status: 400 });
+  }
+
+  await db.prepare('UPDATE lists SET name = ? WHERE id = ?').bind(name.trim(), id).run();
+  return NextResponse.json({ ok: true });
+}
+
 // DELETE /api/lists/[id]
 export async function DELETE(
   _req: NextRequest,

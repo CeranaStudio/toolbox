@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 interface RentInputProps {
-  onResults: (results: unknown[]) => void;
+  onResults: (results: unknown[]) => void | Promise<void>;
+  loadingText?: string;
 }
 
-export function RentInput({ onResults }: RentInputProps) {
+export function RentInput({ onResults, loadingText }: RentInputProps) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export function RentInput({ onResults }: RentInputProps) {
       }
 
       const data = await res.json();
-      onResults(data.results);
+      await onResults(data.results);
       setText("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "發生未知錯誤");
@@ -41,6 +42,8 @@ export function RentInput({ onResults }: RentInputProps) {
       setLoading(false);
     }
   };
+
+  const displayLoadingText = loadingText || "分析中";
 
   return (
     <div style={{ position: "relative" }}>
@@ -100,7 +103,7 @@ export function RentInput({ onResults }: RentInputProps) {
         {loading ? (
           <>
             <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
-            分析中
+            {displayLoadingText}
           </>
         ) : (
           "開始分析"

@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-
-export const runtime = 'nodejs';
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { z } from "zod";
 import { analyzeRequestSchema, rentRecordSchema } from "@/lib/schema";
+import { createHash } from "crypto";
+
+export const runtime = 'nodejs';
+
+function hashPost(text: string): string {
+  // 正規化：去掉多餘空白、換行，讓相同貼文有相同 hash
+  const normalized = text.trim().replace(/\s+/g, " ");
+  return createHash("sha256").update(normalized).digest("hex");
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -18,10 +25,32 @@ export async function POST(request: NextRequest) {
   }
 
   const { posts } = parsed.data;
+  const { env } = await getCloudflareContext({ async: true });
+  const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
 
   try {
     const results = await Promise.all(
       posts.map(async (post) => {
+        const hash = hashPost(post);
+
+        // 查快取
+        const cached = await db
+          .prepare("SELECT structured_result FROM post_cache WHERE hash = ?")
+          .bind(hash)
+          .first<{ structured_result: string }>();
+
+        if (cached) {
+          // 命中：更新 hit_count，直接回傳
+          await db
+            .prepare("UPDATE post_cache SET hit_count = hit_count + 1 WHERE hash = ?")
+            .bind(hash)
+            .run();
+
+          const obj = JSON.parse(cached.structured_result);
+          return { ...obj, id: crypto.randomUUID(), extractedAt: new Date().toISOString() };
+        }
+
+        // 未命中：呼叫 OpenAI
         const { object } = await generateObject({
           model: openai("gpt-5-mini"),
           schema: rentRecordSchema.omit({ extractedAt: true }),
@@ -34,6 +63,14 @@ originalText 請截斷到 200 字以內。
 貼文內容：
 ${post}`,
         });
+
+        // 存快取
+        await db
+          .prepare(
+            "INSERT INTO post_cache (hash, structured_result) VALUES (?, ?) ON CONFLICT(hash) DO NOTHING"
+          )
+          .bind(hash, JSON.stringify(object))
+          .run();
 
         return {
           ...object,

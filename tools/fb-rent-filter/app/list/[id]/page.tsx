@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import { Check, Link as LinkIcon } from 'lucide-react';
 import { RentInput } from '@/components/RentInput';
 import { RentTable } from '@/components/RentTable';
 import { ExportBar } from '@/components/ExportBar';
 import type { RentRecord } from '@/lib/schema';
+
+const RECORD_LIMIT = 30;
 
 interface SharedList {
   id: string;
@@ -21,6 +24,9 @@ export default function SharedListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -32,7 +38,10 @@ export default function SharedListPage() {
       const res = await fetch(`/api/lists/${id}`);
       const data = await res.json();
       if (data.error) setError(data.error);
-      else setList(data);
+      else {
+        setList(data);
+        setNameValue(data.name);
+      }
     } catch {
       setError('載入失敗');
     } finally {
@@ -44,7 +53,39 @@ export default function SharedListPage() {
     fetchList();
   }, [fetchList]);
 
-  // 新分析的結果 append 進 D1 同一個 list
+  useEffect(() => {
+    if (editingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.select();
+    }
+  }, [editingName]);
+
+  const handleSaveName = useCallback(async () => {
+    setEditingName(false);
+    const trimmed = nameValue.trim();
+    if (!trimmed || !list || trimmed === list.name) {
+      setNameValue(list?.name || '');
+      return;
+    }
+    setList((prev) => prev ? { ...prev, name: trimmed } : prev);
+    try {
+      await fetch(`/api/lists/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      });
+    } catch {
+      // revert on failure
+      setList((prev) => prev ? { ...prev, name: list.name } : prev);
+      setNameValue(list.name);
+    }
+  }, [id, list, nameValue]);
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast('連結已複製！');
+  }, [showToast]);
+
   const handleResults = useCallback(async (results: unknown[]) => {
     const newRecords = results as RentRecord[];
     try {
@@ -55,7 +96,6 @@ export default function SharedListPage() {
       });
       if (res.ok) {
         showToast(`新增 ${newRecords.length} 筆，已加入清單`);
-        // 重新 fetch 最新資料
         await fetchList();
       } else {
         showToast('新增失敗，請再試一次');
@@ -66,20 +106,17 @@ export default function SharedListPage() {
   }, [id, fetchList, showToast]);
 
   const handleDelete = useCallback(async (recordId: string) => {
-    // 從本地 state 移除（樂觀更新）
     setList((prev) =>
       prev ? { ...prev, records: prev.records.filter((r) => r.id !== recordId) } : prev
     );
   }, []);
 
   const handleStatusChange = useCallback(async (recordId: string, status: string) => {
-    // 樂觀更新
     setList((prev) =>
       prev
         ? { ...prev, records: prev.records.map((r) => (r.id === recordId ? { ...r, status: status as RentRecord["status"] } : r)) }
         : prev
     );
-    // 背景 sync 到 D1
     fetch(`/api/lists/${id}/records/${recordId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -116,6 +153,16 @@ export default function SharedListPage() {
     );
   }
 
+  const recordCount = list.records.length;
+  const atLimit = recordCount >= RECORD_LIMIT;
+  const nearLimit = recordCount >= 20;
+
+  const countColor = atLimit
+    ? '#dc2626'
+    : nearLimit
+      ? '#d97706'
+      : 'var(--c-muted)';
+
   return (
     <main style={{ minHeight: '100vh', background: 'var(--c-bg)' }}>
       {/* Navbar */}
@@ -130,54 +177,163 @@ export default function SharedListPage() {
           <img src="/logo.svg" alt="" style={{ width: '24px', height: '24px' }} />
           <span style={{ fontSize: '13px', color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
         </a>
+        <button
+          onClick={handleCopyLink}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'none',
+            border: '1px solid var(--c-border)',
+            borderRadius: 8,
+            padding: '6px 14px',
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'var(--c-text)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          <LinkIcon style={{ width: 14, height: 14 }} />
+          複製分享連結
+        </button>
       </nav>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 24px 80px' }}>
         {/* List header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--c-text)', marginBottom: '6px' }}>
-            {list.name}
-          </h1>
+          {editingName ? (
+            <input
+              ref={nameInputRef}
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveName();
+                if (e.key === 'Escape') {
+                  setNameValue(list.name);
+                  setEditingName(false);
+                }
+              }}
+              style={{
+                fontSize: '28px',
+                fontWeight: 700,
+                color: 'var(--c-text)',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '2px solid var(--c-accent)',
+                outline: 'none',
+                width: '100%',
+                padding: '0 0 4px 0',
+                fontFamily: 'inherit',
+                marginBottom: '6px',
+              }}
+            />
+          ) : (
+            <h1
+              onClick={() => setEditingName(true)}
+              style={{
+                fontSize: '28px',
+                fontWeight: 700,
+                color: 'var(--c-text)',
+                marginBottom: '6px',
+                cursor: 'pointer',
+                borderBottom: '2px solid transparent',
+                paddingBottom: '4px',
+              }}
+              title="點擊編輯名稱"
+            >
+              {list.name}
+            </h1>
+          )}
           <p style={{ fontSize: '13px', color: 'var(--c-muted)' }}>
-            共 {list.records.length} 筆 · {new Date(list.created_at).toLocaleDateString('zh-TW')}
+            {new Date(list.created_at).toLocaleDateString('zh-TW')}
           </p>
         </div>
 
         {/* Append input */}
-        <div style={{
-          background: 'var(--c-surface)',
-          border: '1px solid var(--c-border)',
-          borderRadius: '12px',
-          padding: '20px',
-          marginBottom: '32px',
-        }}>
-          <p style={{ fontSize: '12px', color: 'var(--c-muted)', marginBottom: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            繼續新增貼文到這個清單
-          </p>
-          <RentInput onResults={handleResults} />
-        </div>
-
-        {/* Records */}
-        {list.records.length > 0 && (
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: 'var(--c-muted)' }}>{list.records.length} 筆租屋資料</span>
-            <ExportBar records={list.records} onToast={showToast} />
+        {atLimit ? (
+          <div style={{
+            background: '#FEF2F2',
+            border: '1px solid #FECACA',
+            borderRadius: 12,
+            padding: '20px',
+            marginBottom: '24px',
+            textAlign: 'center',
+          }}>
+            <p style={{ fontSize: 14, color: '#dc2626', fontWeight: 600, marginBottom: 6 }}>
+              已達上限（{recordCount}/{RECORD_LIMIT}）
+            </p>
+            <p style={{ fontSize: 13, color: '#d97706' }}>
+              升級解鎖更多空間 →
+            </p>
+          </div>
+        ) : (
+          <div style={{
+            background: 'var(--c-surface)',
+            border: '1px solid var(--c-border)',
+            borderRadius: '12px',
+            padding: '20px',
+            marginBottom: '24px',
+          }}>
+            <p style={{ fontSize: '12px', color: 'var(--c-muted)', marginBottom: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              繼續新增貼文到這個清單
+            </p>
+            <RentInput onResults={handleResults} />
           </div>
         )}
 
-        <RentTable records={list.records} onDelete={handleDelete} onStatusChange={handleStatusChange} onNotesChange={handleNotesChange} />
+        {/* Record count */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}>
+          <span style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: countColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            已儲存 {recordCount} / {RECORD_LIMIT} 筆
+          </span>
+          {recordCount > 0 && (
+            <ExportBar records={list.records} onToast={showToast} />
+          )}
+        </div>
+
+        {/* Records */}
+        {recordCount > 0 ? (
+          <RentTable records={list.records} onDelete={handleDelete} onStatusChange={handleStatusChange} onNotesChange={handleNotesChange} />
+        ) : (
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 20px',
+            color: 'var(--c-muted)',
+            fontSize: 15,
+          }}>
+            還沒有租屋資料，在上方貼入貼文開始分析
+          </div>
+        )}
       </div>
 
       {/* Toast */}
       {toast && (
         <div style={{
           position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-          background: 'var(--c-text)', color: 'white',
-          padding: '10px 20px', borderRadius: '8px',
-          fontSize: '13px', zIndex: 50,
+          zIndex: 50,
           animation: 'slideUp 0.2s ease-out',
         }}>
-          {toast}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'var(--c-text)', color: 'var(--c-bg)',
+            padding: '10px 20px', borderRadius: 8,
+            fontSize: 13,
+          }}>
+            <Check style={{ width: 16, height: 16, color: 'var(--c-accent)', flexShrink: 0 }} />
+            {toast}
+          </div>
         </div>
       )}
     </main>
