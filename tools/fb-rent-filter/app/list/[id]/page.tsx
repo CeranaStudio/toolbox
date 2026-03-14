@@ -138,9 +138,60 @@ export default function SharedListPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'var(--c-muted)', fontSize: '14px' }}>載入中...</div>
-      </div>
+      <main style={{ minHeight: '100vh', background: 'var(--c-bg)' }}>
+        {/* Skeleton navbar */}
+        <nav style={{
+          position: 'sticky', top: 0, zIndex: 10,
+          background: 'var(--c-bg)', borderBottom: '1px solid var(--c-border)',
+          padding: '0 24px', height: '56px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src="/logo.svg" alt="" style={{ width: 24, height: 24 }} />
+            <span style={{ fontSize: 13, color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
+          </div>
+          <div className="skeleton" style={{ width: 100, height: 32 }} />
+        </nav>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(16px,4vw,40px) clamp(16px,4vw,24px) 80px' }}>
+          {/* Skeleton header */}
+          <div style={{ marginBottom: 32 }}>
+            <div className="skeleton" style={{ width: '55%', height: 28, marginBottom: 10 }} />
+            <div className="skeleton" style={{ width: 80, height: 14 }} />
+          </div>
+          {/* Skeleton input area */}
+          <div className="skeleton" style={{ width: '100%', height: 120, borderRadius: 12, marginBottom: 24 }} />
+          {/* Skeleton count bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div className="skeleton" style={{ width: 100, height: 16 }} />
+            <div className="skeleton" style={{ width: 60, height: 16 }} />
+          </div>
+          {/* Skeleton card grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 12 }}>
+            {[1, 2, 3].map((i) => (
+              <div key={i} style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)', borderRadius: 10, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div className="skeleton" style={{ width: 48, height: 22, borderRadius: 12 }} />
+                  <div className="skeleton" style={{ width: 28, height: 22, borderRadius: 6 }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div className="skeleton" style={{ width: '45%', height: 24 }} />
+                  <div className="skeleton" style={{ width: '25%', height: 22, borderRadius: 12 }} />
+                </div>
+                <div className="skeleton" style={{ width: '80%', height: 16, marginBottom: 10 }} />
+                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                  <div className="skeleton" style={{ width: 40, height: 14 }} />
+                  <div className="skeleton" style={{ width: 40, height: 14 }} />
+                  <div className="skeleton" style={{ width: 40, height: 14 }} />
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+                  {[1, 2, 3].map((j) => <div key={j} className="skeleton" style={{ width: 52, height: 24, borderRadius: 12 }} />)}
+                </div>
+                <div className="skeleton" style={{ width: '60%', height: 14 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     );
   }
 

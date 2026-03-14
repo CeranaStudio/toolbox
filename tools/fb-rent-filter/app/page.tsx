@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
+
 import { RentInput } from "@/components/RentInput";
 
 export default function Page() {
@@ -90,19 +91,17 @@ export default function Page() {
         {/* Input */}
         <section style={{ paddingBottom: 48 }}>
           {creating ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 10,
-                padding: "60px 0",
-                color: "var(--c-muted)",
-                fontSize: 15,
-              }}
-            >
-              <Loader2 style={{ width: 18, height: 18, animation: "spin 1s linear infinite" }} />
-              建立清單中...
+            <div style={{ padding: "8px 0 40px" }}>
+              {/* Skeleton textarea */}
+              <div className="skeleton" style={{ width: '100%', height: 140, borderRadius: 12, marginBottom: 12 }} />
+              {/* Skeleton button */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="skeleton" style={{ width: 140, height: 40, borderRadius: 20 }} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, color: 'var(--c-muted)', fontSize: 13 }}>
+                <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                AI 分析中，建立清單...
+              </div>
             </div>
           ) : (
             <>

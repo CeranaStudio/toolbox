@@ -107,7 +107,19 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
       >
         {loading ? (
           <>
-            <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+            <span style={{ display: 'inline-flex', gap: 3 }}>
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: 4, height: 4, borderRadius: '50%', background: 'currentColor',
+                    animation: 'dotPulse 1.2s ease-in-out infinite',
+                    animationDelay: `${i * 0.2}s`,
+                    display: 'inline-block',
+                  }}
+                />
+              ))}
+            </span>
             {displayLoadingText}
           </>
         ) : (
