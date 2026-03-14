@@ -3,6 +3,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { analyzeRequestSchema, rentRecordSchema } from "@/lib/schema";
+import { checkRateLimit } from "@/lib/rateLimit";
 import { createHash } from "crypto";
 
 export const runtime = 'nodejs';
@@ -27,6 +28,10 @@ export async function POST(request: NextRequest) {
   const { posts } = parsed.data;
   const { env } = await getCloudflareContext({ async: true });
   const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
+
+  // Rate limit: 5 analyze calls per minute per IP
+  const rateLimitResponse = await checkRateLimit(db, request, 5);
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const results = await Promise.all(

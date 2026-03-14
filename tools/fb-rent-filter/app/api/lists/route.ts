@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -7,6 +8,10 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   const { env } = await getCloudflareContext({ async: true });
   const db = (env as unknown as CloudflareEnv).fb_rent_filter_db;
+
+  // Rate limit: 20 list creations per minute per IP (looser than analyze)
+  const rateLimitResponse = await checkRateLimit(db, req, 20);
+  if (rateLimitResponse) return rateLimitResponse;
 
   const body = await req.json();
   const { name, records } = body as {
