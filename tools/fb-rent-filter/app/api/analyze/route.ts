@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const results = await Promise.all(
       posts.map(async (post) => {
         const { object } = await generateObject({
-          model: openai("gpt-4o"),
+          model: openai("gpt-5-mini"),
           schema: rentRecordSchema.omit({ extractedAt: true }),
           prompt: `你是一個台灣租屋資訊萃取助手。請從以下 Facebook 租屋社團貼文中萃取結構化的租屋資料。
 如果某個欄位在貼文中找不到，就設為 null。

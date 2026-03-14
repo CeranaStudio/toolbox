@@ -5,9 +5,10 @@ import type { RentRecord } from "@/lib/schema";
 
 interface ExportBarProps {
   records: RentRecord[];
+  onToast: (message: string) => void;
 }
 
-export function ExportBar({ records }: ExportBarProps) {
+export function ExportBar({ records, onToast }: ExportBarProps) {
   if (records.length === 0) return null;
 
   const downloadFile = (content: string, filename: string, type: string) => {
@@ -50,7 +51,7 @@ export function ExportBar({ records }: ExportBarProps) {
       r.extractedAt,
     ]);
 
-    const escape = (v: unknown) => {
+    const csvEscape = (v: unknown) => {
       const s = String(v);
       return s.includes(",") || s.includes('"') || s.includes("\n")
         ? `"${s.replace(/"/g, '""')}"`
@@ -59,9 +60,10 @@ export function ExportBar({ records }: ExportBarProps) {
 
     const csv =
       "\uFEFF" +
-      [headers, ...rows].map((row) => row.map(escape).join(",")).join("\n");
+      [headers, ...rows].map((row) => row.map(csvEscape).join(",")).join("\n");
 
     downloadFile(csv, "rent-records.csv", "text/csv;charset=utf-8");
+    onToast("CSV 已下載");
   };
 
   const exportJSON = () => {
@@ -70,39 +72,42 @@ export function ExportBar({ records }: ExportBarProps) {
       "rent-records.json",
       "application/json",
     );
+    onToast("JSON 已下載");
   };
 
   const copyShareLink = async () => {
-    const data = btoa(
-      unescape(encodeURIComponent(JSON.stringify(records))),
-    );
+    const data = btoa(encodeURIComponent(JSON.stringify(records)));
     const url = `${window.location.origin}${window.location.pathname}?data=${data}`;
     await navigator.clipboard.writeText(url);
-    alert("分享連結已複製到剪貼簿！");
+    onToast("分享連結已複製到剪貼簿！");
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-xs font-medium text-stone-muted tabular-nums">
+        {records.length} 筆
+      </span>
+      <span className="text-stone-border">|</span>
       <button
         onClick={exportCSV}
-        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
       >
-        <Download className="h-4 w-4" />
-        匯出 CSV
+        <Download className="h-3.5 w-3.5" />
+        CSV
       </button>
       <button
         onClick={exportJSON}
-        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
       >
-        <FileJson className="h-4 w-4" />
-        匯出 JSON
+        <FileJson className="h-3.5 w-3.5" />
+        JSON
       </button>
       <button
         onClick={copyShareLink}
-        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-stone-muted hover:text-charcoal transition-colors"
       >
-        <Link className="h-4 w-4" />
-        複製分享連結
+        <Link className="h-3.5 w-3.5" />
+        複製連結
       </button>
     </div>
   );

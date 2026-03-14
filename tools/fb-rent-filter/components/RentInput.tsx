@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface RentInputProps {
   onResults: (results: unknown[]) => void;
@@ -48,29 +48,39 @@ export function RentInput({ onResults }: RentInputProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div>
+      <label className="block text-xs tracking-widest uppercase text-stone-muted font-medium mb-3">
+        貼上 FB 租屋貼文
+      </label>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="貼上 Facebook 租屋社團的貼文...&#10;&#10;可一次貼多篇，用空白行分隔"
-        className="w-full min-h-[200px] rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm leading-relaxed placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all resize-y"
+        placeholder={"在這裡貼上 Facebook 租屋社團的貼文內容...\n\n例如：\n「板橋套房出租，近府中捷運站，月租 12000 含水費...」\n\n可以一次貼入多篇貼文，用空白行隔開即可"}
+        className="w-full min-h-[200px] border border-stone-border bg-white p-4 text-sm leading-relaxed placeholder:text-stone-muted/50 focus:border-charcoal focus:outline-none transition-colors resize-y"
         disabled={loading}
       />
+      <p className="mt-2 text-xs text-stone-muted">
+        可一次貼入多篇貼文，用空白行隔開
+      </p>
       {error && (
-        <p className="text-sm text-red-500">{error}</p>
+        <p className="mt-3 text-sm text-red-600">{error}</p>
       )}
-      <button
-        onClick={handleAnalyze}
-        disabled={loading || !text.trim()}
-        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Search className="h-4 w-4" />
-        )}
-        {loading ? "分析中..." : "分析"}
-      </button>
+      <div className="mt-4">
+        <button
+          onClick={handleAnalyze}
+          disabled={loading || !text.trim()}
+          className="inline-flex items-center gap-2 bg-charcoal px-8 py-3 text-sm font-medium text-warm-white hover:bg-charcoal-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              分析中...
+            </>
+          ) : (
+            "開始分析"
+          )}
+        </button>
+      </div>
     </div>
   );
 }

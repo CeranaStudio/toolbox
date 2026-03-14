@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, ArrowUpDown } from "lucide-react";
+import { Trash2, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import type { RentRecord } from "@/lib/schema";
 
 type SortKey = "price" | "size";
@@ -15,12 +15,18 @@ interface RentTableProps {
 export function RentTable({ records, onDelete }: RentTableProps) {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (records.length === 0) {
     return (
-      <p className="text-center text-gray-400 py-12">
-        尚無資料，請貼上租屋貼文並點擊分析
-      </p>
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <p className="font-serif text-2xl text-charcoal/30 italic mb-2">
+          還沒有資料
+        </p>
+        <p className="text-sm text-stone-muted">
+          把 FB 租屋貼文貼上來試試看
+        </p>
+      </div>
     );
   }
 
@@ -31,6 +37,10 @@ export function RentTable({ records, onDelete }: RentTableProps) {
       setSortKey(key);
       setSortDir("asc");
     }
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   const sorted = [...records].sort((a, b) => {
@@ -45,139 +55,204 @@ export function RentTable({ records, onDelete }: RentTableProps) {
   return (
     <div>
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-gray-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">標題</th>
-              <th className="px-4 py-3 font-medium">
+          <thead>
+            <tr className="border-b-2 border-charcoal text-left">
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">標題</th>
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">
                 <button
                   onClick={() => handleSort("price")}
-                  className="inline-flex items-center gap-1 hover:text-gray-900"
+                  className="inline-flex items-center gap-1 hover:text-charcoal transition-colors"
                 >
                   月租
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
-              <th className="px-4 py-3 font-medium">地區</th>
-              <th className="px-4 py-3 font-medium">房型</th>
-              <th className="px-4 py-3 font-medium">
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">地區</th>
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">房型</th>
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">
                 <button
                   onClick={() => handleSort("size")}
-                  className="inline-flex items-center gap-1 hover:text-gray-900"
+                  className="inline-flex items-center gap-1 hover:text-charcoal transition-colors"
                 >
                   坪數
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
-              <th className="px-4 py-3 font-medium">樓層</th>
-              <th className="px-4 py-3 font-medium">特色</th>
-              <th className="px-4 py-3 font-medium">聯絡</th>
-              <th className="px-4 py-3 font-medium w-10" />
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">樓層</th>
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">特色</th>
+              <th className="px-3 py-3 font-medium text-xs tracking-widest uppercase text-stone-muted">聯絡</th>
+              <th className="px-3 py-3 w-20" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {sorted.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-medium max-w-[200px] truncate">
-                  {r.title}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {r.price != null ? `$${r.price.toLocaleString()}` : "-"}
-                </td>
-                <td className="px-4 py-3">{r.district ?? "-"}</td>
-                <td className="px-4 py-3">{r.roomType ?? "-"}</td>
-                <td className="px-4 py-3">
-                  {r.size != null ? `${r.size} 坪` : "-"}
-                </td>
-                <td className="px-4 py-3">{r.floor ?? "-"}</td>
-                <td className="px-4 py-3 max-w-[200px]">
-                  <div className="flex flex-wrap gap-1">
-                    {r.features.map((f, i) => (
-                      <span
-                        key={i}
-                        className="inline-block rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
-                      >
-                        {f}
+              <>
+                <tr
+                  key={r.id}
+                  className="border-b border-stone-border hover:bg-stone-light transition-colors"
+                >
+                  <td className="px-3 py-3.5 font-medium max-w-[200px] truncate text-charcoal">
+                    {r.title}
+                  </td>
+                  <td className="px-3 py-3.5 whitespace-nowrap">
+                    {r.price != null ? (
+                      <span className="font-bold text-accent tabular-nums text-base">
+                        ${r.price.toLocaleString()}
                       </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-xs text-gray-500">
-                  {r.contact ?? "-"}
-                </td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => onDelete(r.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                    title="刪除"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </td>
-              </tr>
+                    ) : (
+                      <span className="text-stone-muted/40">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-3.5 text-charcoal/70">{r.district ?? <span className="text-stone-muted/40">—</span>}</td>
+                  <td className="px-3 py-3.5 text-charcoal/70">{r.roomType ?? <span className="text-stone-muted/40">—</span>}</td>
+                  <td className="px-3 py-3.5 text-charcoal/70 tabular-nums">
+                    {r.size != null ? `${r.size} 坪` : <span className="text-stone-muted/40">—</span>}
+                  </td>
+                  <td className="px-3 py-3.5 text-charcoal/70">{r.floor ?? <span className="text-stone-muted/40">—</span>}</td>
+                  <td className="px-3 py-3.5 max-w-[240px]">
+                    <span className="text-charcoal/60 text-xs">
+                      {r.features.join(" · ")}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3.5 text-xs text-charcoal/50">
+                    {r.contact ?? <span className="text-stone-muted/40">—</span>}
+                  </td>
+                  <td className="px-3 py-3.5">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => toggleExpand(r.id)}
+                        className="text-stone-muted hover:text-charcoal transition-colors p-1"
+                        title="查看原文"
+                      >
+                        {expandedId === r.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => onDelete(r.id)}
+                        className="text-stone-muted hover:text-red-600 transition-colors p-1"
+                        title="刪除"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {expandedId === r.id && r.originalText && (
+                  <tr key={`${r.id}-expanded`} className="border-b border-stone-border">
+                    <td colSpan={9} className="px-6 py-4 bg-stone-light">
+                      <div className="text-xs text-charcoal/50 leading-relaxed max-w-3xl">
+                        <span className="font-medium text-charcoal/70">原始貼文：</span>
+                        <p className="mt-1 whitespace-pre-wrap">{r.originalText}</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>
       </div>
 
       {/* Mobile card list */}
-      <div className="md:hidden space-y-3">
-        <div className="flex gap-2 mb-2">
+      <div className="md:hidden divide-y divide-stone-border">
+        <div className="flex gap-2 py-4">
           <button
             onClick={() => handleSort("price")}
-            className="text-xs rounded-lg border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
+            className="text-xs border border-stone-border bg-white px-3 py-1.5 hover:bg-stone-light font-medium text-charcoal/70 transition-colors"
           >
             依月租排序 <ArrowUpDown className="inline h-3 w-3" />
           </button>
           <button
             onClick={() => handleSort("size")}
-            className="text-xs rounded-lg border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
+            className="text-xs border border-stone-border bg-white px-3 py-1.5 hover:bg-stone-light font-medium text-charcoal/70 transition-colors"
           >
             依坪數排序 <ArrowUpDown className="inline h-3 w-3" />
           </button>
         </div>
         {sorted.map((r) => (
-          <div
-            key={r.id}
-            className="rounded-xl border border-gray-200 p-4 space-y-2"
-          >
+          <div key={r.id} className="py-5 space-y-3">
             <div className="flex items-start justify-between">
-              <h3 className="font-medium text-sm">{r.title}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-sm text-charcoal truncate">{r.title}</h3>
+                {r.price != null && (
+                  <p className="text-xl font-bold text-accent mt-1 tabular-nums">
+                    ${r.price.toLocaleString()}<span className="text-xs font-light text-stone-muted"> /月</span>
+                  </p>
+                )}
+              </div>
               <button
                 onClick={() => onDelete(r.id)}
-                className="text-gray-400 hover:text-red-500 transition-colors shrink-0 ml-2"
+                className="text-stone-muted hover:text-red-600 transition-colors shrink-0 ml-2 p-1"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
-              <span>月租</span>
-              <span className="font-medium text-gray-900">
-                {r.price != null ? `$${r.price.toLocaleString()}` : "-"}
-              </span>
-              <span>地區</span>
-              <span>{r.district ?? "-"}</span>
-              <span>房型</span>
-              <span>{r.roomType ?? "-"}</span>
-              <span>坪數</span>
-              <span>{r.size != null ? `${r.size} 坪` : "-"}</span>
-              <span>樓層</span>
-              <span>{r.floor ?? "-"}</span>
-              <span>聯絡</span>
-              <span className="text-xs">{r.contact ?? "-"}</span>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+              {r.district && (
+                <>
+                  <span className="text-stone-muted">地區</span>
+                  <span className="text-charcoal/80">{r.district}</span>
+                </>
+              )}
+              {r.roomType && (
+                <>
+                  <span className="text-stone-muted">房型</span>
+                  <span className="text-charcoal/80">{r.roomType}</span>
+                </>
+              )}
+              {r.size != null && (
+                <>
+                  <span className="text-stone-muted">坪數</span>
+                  <span className="text-charcoal/80">{r.size} 坪</span>
+                </>
+              )}
+              {r.floor && (
+                <>
+                  <span className="text-stone-muted">樓層</span>
+                  <span className="text-charcoal/80">{r.floor}</span>
+                </>
+              )}
+              {r.deposit && (
+                <>
+                  <span className="text-stone-muted">押金</span>
+                  <span className="text-charcoal/80">{r.deposit}</span>
+                </>
+              )}
+              {r.contact && (
+                <>
+                  <span className="text-stone-muted">聯絡</span>
+                  <span className="text-charcoal/80 text-xs">{r.contact}</span>
+                </>
+              )}
+              {r.moveInDate && (
+                <>
+                  <span className="text-stone-muted">入住</span>
+                  <span className="text-charcoal/80">{r.moveInDate}</span>
+                </>
+              )}
             </div>
             {r.features.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-1">
-                {r.features.map((f, i) => (
-                  <span
-                    key={i}
-                    className="inline-block rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
-                  >
-                    {f}
-                  </span>
-                ))}
-              </div>
+              <p className="text-xs text-charcoal/50">
+                {r.features.join(" · ")}
+              </p>
+            )}
+            {r.originalText && (
+              <button
+                onClick={() => toggleExpand(r.id)}
+                className="text-xs text-stone-muted hover:text-charcoal transition-colors"
+              >
+                {expandedId === r.id ? "收合原文" : "查看原文"}
+              </button>
+            )}
+            {expandedId === r.id && r.originalText && (
+              <p className="text-xs text-charcoal/50 border-l-2 border-stone-border pl-3 leading-relaxed whitespace-pre-wrap">
+                {r.originalText}
+              </p>
             )}
           </div>
         ))}

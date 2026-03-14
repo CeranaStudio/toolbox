@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "FB 租屋過濾器",
   description: "從 Facebook 租屋社團貼文萃取結構化租屋資料",
+  icons: { icon: "/logo.svg" },
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-Hant">
-      <body className="bg-white text-gray-900 antialiased">{children}</body>
+      <body className="bg-warm-white text-charcoal antialiased font-sans">
+        {children}
+      </body>
     </html>
   );
 }
