@@ -226,6 +226,15 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 >
                   {cfg.label}
                 </button>
+                {r.subsidyEligible === true && (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: "3px 8px",
+                    borderRadius: 12, background: "#D1FAE5", color: "#065F46",
+                    border: "1px solid #6EE7B7",
+                  }}>
+                    ✓ 可租補
+                  </span>
+                )}
                 <button
                   onClick={() => onDelete(r.id)}
                   className="rent-card-delete"
@@ -344,16 +353,47 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                 </div>
               )}
 
-              {/* Contact + expand */}
+              {/* Parking */}
+              {r.parking && (
+                <p style={{ fontSize: 12, color: "var(--c-muted)", marginBottom: 8 }}>
+                  🚗 {r.parking}
+                </p>
+              )}
+
+              {/* Contact + map + expand */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                {r.contact ? (
-                  <span style={{ fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 4 }}>
-                    <Phone style={{ width: 12, height: 12 }} />
-                    {r.contact}
-                  </span>
-                ) : (
-                  <span />
-                )}
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {r.contact ? (
+                    <span style={{ fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <Phone style={{ width: 12, height: 12 }} />
+                      {r.contact}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  {(r.address || r.district) && (
+                    <a
+                      href={`https://www.google.com/maps/search/${encodeURIComponent([r.address, r.district].filter(Boolean).join(" ") + " 台灣")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="在 Google Maps 開啟"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 28, height: 28,
+                        borderRadius: 6,
+                        border: "1px solid var(--c-border)",
+                        color: "var(--c-muted)",
+                        textDecoration: "none",
+                        fontSize: 14,
+                        flexShrink: 0,
+                      }}
+                    >
+                      📍
+                    </a>
+                  )}
+                </div>
                 {r.originalText && (
                   <button
                     onClick={() => toggleExpand(r.id)}

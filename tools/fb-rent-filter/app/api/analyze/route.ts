@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
           prompt: `你是一個台灣租屋資訊萃取助手。請從以下 Facebook 租屋社團貼文中萃取結構化的租屋資料。
 如果某個欄位在貼文中找不到，就設為 null。
 features 欄位請萃取所有值得注意的特色，如：近捷運、附冷氣、附家具、可養寵物、有陽台等。
+subsidyEligible: 如果貼文提到「可租補」「符合租補資格」「政府租補」等就設為 true；明確說「不可租補」就設為 false；其他就設為 null。
+parking: 停車位相關描述，沒有就設為 null。
 originalText 請截斷到 200 字以內。
 所有文字用繁體中文。
 

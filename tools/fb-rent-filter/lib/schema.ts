@@ -14,6 +14,8 @@ export const rentRecordSchema = z.object({
   floor: z.string().nullable().describe("樓層描述"),
   features: z.array(z.string()).describe("特色 tags，如：近捷運、附冷氣、寵物友善"),
   contact: z.string().nullable().describe("聯絡方式"),
+  subsidyEligible: z.boolean().nullable().describe("是否可申請租屋補貼（租補），明確提到可租補就 true，明確說不可就 false，沒提就 null"),
+  parking: z.string().nullable().describe("停車位說明，例如：有車位、租車位另計、無車位，沒提就 null"),
   moveInDate: z.string().nullable().describe("可入住時間"),
   originalText: z.string().describe("原始貼文（截斷到 200 字）"),
   extractedAt: z.string().describe("萃取時間 ISO string"),

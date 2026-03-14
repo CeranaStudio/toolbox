@@ -6,6 +6,7 @@ import { Check, Link as LinkIcon } from 'lucide-react';
 import { RentInput } from '@/components/RentInput';
 import { RentTable } from '@/components/RentTable';
 import { ExportBar } from '@/components/ExportBar';
+import { PWAInstallToast } from '@/components/PWAInstallToast';
 import type { RentRecord } from '@/lib/schema';
 
 const RECORD_LIMIT = 30;
@@ -227,27 +228,41 @@ export default function SharedListPage() {
           <img src="/logo.svg" alt="" style={{ width: '24px', height: '24px' }} />
           <span style={{ fontSize: '13px', color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
         </a>
-        <button
-          onClick={handleCopyLink}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'none',
-            border: '1px solid var(--c-border)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '8px 12px',
-            fontSize: 13,
-            fontWeight: 500,
-            color: 'var(--c-text)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            touchAction: 'manipulation',
-          }}
-        >
-          <LinkIcon style={{ width: 14, height: 14 }} />
-          <span className="desktop-only">複製分享連結</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <a
+            href={`/list/${id}/map`}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '6px 12px',
+              border: '1px solid var(--c-border)',
+              borderRadius: 8, fontSize: 13, fontWeight: 500,
+              color: 'var(--c-text)', textDecoration: 'none',
+            }}
+          >
+            🗺️ <span className="desktop-only">地圖總覽</span>
+          </a>
+          <button
+            onClick={handleCopyLink}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'none',
+              border: '1px solid var(--c-border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '8px 12px',
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'var(--c-text)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              touchAction: 'manipulation',
+            }}
+          >
+            <LinkIcon style={{ width: 14, height: 14 }} />
+            <span className="desktop-only">複製分享連結</span>
+          </button>
+        </div>
       </nav>
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(16px, 4vw, 24px) 80px' }}>
@@ -378,6 +393,8 @@ export default function SharedListPage() {
           </div>
         </div>
       )}
+
+      <PWAInstallToast />
     </main>
   );
 }

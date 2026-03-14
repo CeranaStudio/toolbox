@@ -36,6 +36,8 @@ export async function POST(
       floor?: string;
       features?: string[];
       contact?: string;
+      subsidyEligible?: boolean | null;
+      parking?: string | null;
       moveInDate?: string;
       originalText?: string;
       extractedAt?: string;
@@ -48,8 +50,8 @@ export async function POST(
 
   const stmt = db.prepare(
     `INSERT OR IGNORE INTO records
-      (id, list_id, title, price, deposit, district, address, size, room_type, floor, features, contact, move_in_date, original_text, extracted_at, status, notes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, list_id, title, price, deposit, district, address, size, room_type, floor, features, contact, subsidy_eligible, parking, move_in_date, original_text, extracted_at, status, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
 
   await db.batch(
@@ -67,6 +69,8 @@ export async function POST(
         r.floor ?? null,
         r.features ? JSON.stringify(r.features) : null,
         r.contact ?? null,
+        r.subsidyEligible === true ? 1 : r.subsidyEligible === false ? 0 : null,
+        r.parking ?? null,
         r.moveInDate ?? null,
         r.originalText ?? null,
         r.extractedAt ?? null,

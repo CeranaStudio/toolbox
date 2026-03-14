@@ -42,6 +42,8 @@ export async function GET(
     moveInDate: r.move_in_date,
     originalText: r.original_text,
     extractedAt: r.extracted_at,
+    subsidyEligible: r.subsidy_eligible === 1 ? true : r.subsidy_eligible === 0 ? false : null,
+    parking: r.parking,
     status: r.status ?? 'interested',
     notes: r.notes ?? null,
   }));

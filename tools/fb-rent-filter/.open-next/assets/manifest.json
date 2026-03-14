@@ -1,0 +1,42 @@
+{
+  "name": "FB 租屋過濾器",
+  "short_name": "租屋過濾器",
+  "description": "貼上 FB 租屋貼文，AI 自動整理，建立你的專屬清單",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAF8",
+  "theme_color": "#E8572A",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "/icons/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "text": "share_text",
+      "title": "share_title",
+      "url": "share_url"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "建立新清單",
+      "url": "/",
+      "description": "貼上貼文開始分析"
+    }
+  ]
+}
