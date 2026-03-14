@@ -149,7 +149,7 @@ export default function SharedListPage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <img src="/logo.svg" alt="" style={{ width: 24, height: 24 }} />
-            <span style={{ fontSize: 13, color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
+            <span style={{ fontSize: 13, color: 'var(--c-muted)', fontWeight: 500 }}>租多好室</span>
           </div>
           <div className="skeleton" style={{ width: 100, height: 32 }} />
         </nav>
@@ -226,7 +226,7 @@ export default function SharedListPage() {
       }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <img src="/logo.svg" alt="" style={{ width: '24px', height: '24px' }} />
-          <span style={{ fontSize: '13px', color: 'var(--c-muted)', fontWeight: 500 }}>FB 租屋過濾器</span>
+          <span style={{ fontSize: '13px', color: 'var(--c-muted)', fontWeight: 500 }}>租多好室</span>
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <a

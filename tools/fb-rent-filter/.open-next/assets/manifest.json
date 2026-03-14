@@ -1,7 +1,7 @@
 {
-  "name": "FB 租屋過濾器",
-  "short_name": "租屋過濾器",
-  "description": "貼上 FB 租屋貼文，AI 自動整理，建立你的專屬清單",
+  "name": "租多好室",
+  "short_name": "租多好室",
+  "description": "AI 幫你從社群貼文找出好室，整理、比較、分享，找房不再頭痛",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -3,13 +3,13 @@ import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 
 export const metadata: Metadata = {
-  title: "FB 租屋過濾器",
-  description: "貼上 FB 租屋貼文，AI 自動整理，建立你的專屬清單",
+  title: "租多好室",
+  description: "AI 幫你從社群貼文找出好室，整理、比較、分享，找房不再頭痛",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "租屋過濾器",
+    title: "租多好室",
   },
   icons: {
     icon: "/logo.svg",

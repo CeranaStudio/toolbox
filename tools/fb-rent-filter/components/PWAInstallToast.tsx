@@ -20,6 +20,7 @@ export function PWAInstallToast() {
     if (typeof window === "undefined") return;
     if (localStorage.getItem(DISMISSED_KEY)) return;
     if (window.matchMedia("(display-mode: standalone)").matches) return;
+    if ((window.navigator as Navigator & { standalone?: boolean }).standalone === true) return;
 
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
     setIsIOS(ios);

@@ -54,10 +54,12 @@ export default function MapPage() {
       if (!mapRef.current) return;
 
       const map = L.map(mapRef.current).setView([25.033, 121.565], 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      map.invalidateSize();
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
-        maxZoom: 18,
+        maxZoom: 19,
       }).addTo(map);
+      setTimeout(() => map.invalidateSize(), 100);
 
       setStatus(`正在定位 ${recs.length} 筆房源...`);
       setLoading(false);
@@ -90,7 +92,7 @@ export default function MapPage() {
   }, [id]);
 
   return (
-    <main style={{ minHeight: "100vh", background: "#FAFAF8", display: "flex", flexDirection: "column" }}>
+    <main style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Navbar */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 1000,
@@ -131,7 +133,7 @@ export default function MapPage() {
       {/* Map container */}
       <div
         ref={mapRef}
-        style={{ flex: 1, minHeight: "calc(100vh - 100px)" }}
+        style={{ width: "100%", height: "calc(100vh - 100px)", position: "relative" }}
       />
     </main>
   );
@@ -145,6 +147,7 @@ interface LeafletStatic {
 }
 interface LeafletMap {
   setView(coords: [number, number], zoom: number): LeafletMap;
+  invalidateSize(): void;
 }
 interface LeafletMarker {
   addTo(map: LeafletMap): LeafletMarker;

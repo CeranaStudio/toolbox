@@ -57,7 +57,7 @@ export default function Page() {
         >
           <img src="/logo.svg" alt="" style={{ width: 24, height: 24 }} />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--c-text)", letterSpacing: "-0.01em" }}>
-            FB 租屋過濾器
+            租多好室
           </span>
         </div>
       </header>
@@ -74,12 +74,12 @@ export default function Page() {
               color: "var(--c-text)",
             }}
           >
-            從 FB 貼文
+            AI 幫你
             <br />
-            <span style={{ color: "var(--c-accent)" }}>找到你的家</span>
+            <span style={{ color: "var(--c-accent)" }}>找到好室</span>
           </h1>
           <p style={{ marginTop: 14, fontSize: 16, color: "var(--c-muted)", maxWidth: 340 }}>
-            貼上貼文，AI 自動整理重點，建立你的專屬清單
+            從社群貼文整理、比較、分享，找房不再頭痛
           </p>
           <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap" }}>
             {["📋 AI 自動整理", "🔗 一鍵分享", "👥 多人協作"].map((hint) => (
