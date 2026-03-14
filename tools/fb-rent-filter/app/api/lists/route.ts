@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // POST /api/lists — 建立新清單並存入 records
 export async function POST(req: NextRequest) {

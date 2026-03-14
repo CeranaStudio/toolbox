@@ -1,47 +1,67 @@
-# fb-rent-filter
+# fb-rent-filter 🏠
 
-從 Facebook 租屋社團貼文萃取結構化租屋資料的 Next.js 應用程式。
+把 Facebook 租屋社團貼文丟進來，用 AI 洗出結構化租房資料。
 
 ## 功能
 
-- 貼上 FB 租屋貼文，用 AI（GPT-4o）萃取租金、地區、坪數、房型等欄位
-- 支援一次貼多篇（空白行分隔）
-- 結果以表格呈現，支援排序、刪除
-- localStorage 持久化儲存
-- 匯出 CSV / JSON / 分享連結
+- 貼入 FB 租屋貼文（支援一次多篇）
+- GPT-4o 萃取：月租金、地區、地址、坪數、房型、特色 tags、聯絡方式等
+- 結果以表格顯示，支援排序、刪除
+- localStorage 儲存（重整不掉）
+- 匯出 CSV / JSON
+- **雲端清單**：儲存到 Cloudflare D1，產生分享連結給朋友看
 
-## 設定
+## 技術
 
-1. 安裝依賴：
+- Next.js 15 App Router
+- Vercel AI SDK + OpenAI gpt-4o（structured output）
+- Cloudflare Workers（`@opennextjs/cloudflare`）
+- Cloudflare D1（SQLite，存共享清單）
 
-```bash
-bun install
-```
-
-2. 設定環境變數：
-
-```bash
-cp .env.example .env
-```
-
-編輯 `.env`，填入你的 OpenAI API Key：
-
-```
-OPENAI_API_KEY=sk-...
-```
-
-3. 啟動開發伺服器：
+## 本地開發
 
 ```bash
-bun run dev
+cp .env.example .env.local
+# 填入 OPENAI_API_KEY
+npm install
+npm run dev
 ```
 
-開啟 http://localhost:3000 即可使用。
+## 部署到 Cloudflare Workers
 
-## 技術棧
+### 1. 設定 API Key（一次性）
 
-- Next.js 15 (App Router)
-- TypeScript
-- Tailwind CSS v4
-- Vercel AI SDK + OpenAI
-- Zod
+```bash
+npx wrangler secret put OPENAI_API_KEY
+# 貼上你的 OpenAI API Key，Enter 送出
+```
+
+### 2. Build + Deploy
+
+```bash
+npm install
+npm run worker:deploy
+```
+
+### 3. D1 Migration（第一次部署前）
+
+```bash
+npx wrangler d1 execute fb-rent-filter-db --remote --file=migrations/0001_init.sql
+```
+
+## 環境變數
+
+| 變數 | 說明 |
+|------|------|
+| `OPENAI_API_KEY` | OpenAI API Key（存在 Worker Secret，不會外洩） |
+
+## D1 Database
+
+- Database: `fb-rent-filter-db`
+- ID: `ae874d9d-584a-475c-a99f-1c50b93ff171`
+- Tables: `lists`, `records`
+
+## 安全性
+
+`OPENAI_API_KEY` 只存在 Cloudflare Worker Secret，永遠不會傳到 client（瀏覽器）。
+前端只呼叫 `/api/analyze`，key 只在 Worker 裡使用。

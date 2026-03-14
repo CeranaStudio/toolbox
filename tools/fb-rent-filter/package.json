@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "npm run pages:build && npx wrangler pages dev",
-    "deploy": "npm run pages:build && npx wrangler pages deploy",
+    "worker:build": "npx @opennextjs/cloudflare build",
+    "worker:dev": "npm run worker:build && npx wrangler dev",
+    "worker:deploy": "npm run worker:build && npx wrangler deploy",
     "cf-typegen": "npx wrangler types --env-interface CloudflareEnv env.d.ts"
   },
   "dependencies": {
@@ -27,7 +27,7 @@
     "@types/react-dom": "^19.0.0",
     "@tailwindcss/postcss": "^4.0.0",
     "tailwindcss": "^4.0.0",
-    "@cloudflare/next-on-pages": "^1.0.0",
-    "wrangler": "^3.0.0"
+    "@opennextjs/cloudflare": "^1.0.0",
+    "wrangler": "^4.0.0"
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestContext } from '@cloudflare/next-on-pages';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // GET /api/lists/[id] — 取得清單及其 records
 export async function GET(
