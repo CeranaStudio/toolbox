@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Trash2, ChevronDown, ChevronUp, ArrowUpDown, Phone } from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp, ArrowUpDown, Phone, Car, MapPin } from "lucide-react";
 import type { RentRecord, RecordStatus } from "@/lib/schema";
 import { STATUS_CONFIG } from "@/lib/schema";
 
@@ -356,7 +356,7 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
               {/* Parking */}
               {r.parking && (
                 <p style={{ fontSize: 12, color: "var(--c-muted)", marginBottom: 8 }}>
-                  🚗 {r.parking}
+                  <Car style={{ width: 12, height: 12, display: "inline", verticalAlign: "middle" }} /> {r.parking}
                 </p>
               )}
 
@@ -390,7 +390,7 @@ export function RentTable({ records, onDelete, onStatusChange, onNotesChange }: 
                         flexShrink: 0,
                       }}
                     >
-                      📍
+                      <MapPin style={{ width: 14, height: 14 }} />
                     </a>
                   )}
                 </div>

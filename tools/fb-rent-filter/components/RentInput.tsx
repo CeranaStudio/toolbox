@@ -14,6 +14,8 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
   const [error, setError] = useState<string | null>(null);
   const [focused, setFocused] = useState(false);
 
+  const hasText = text.trim().length > 0;
+
   const handleAnalyze = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -58,11 +60,11 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
             handleAnalyze();
           }
         }}
-        placeholder={"貼上一篇 Facebook 租屋社團的貼文..."}
+        placeholder={"把租屋貼文貼到這裡，其他交給 AI ↓"}
         disabled={loading}
         style={{
           width: "100%",
-          minHeight: 120,
+          minHeight: 180,
           border: `1px solid ${focused ? "var(--c-accent)" : "var(--c-border)"}`,
           borderRadius: "var(--radius-lg)",
           background: "var(--c-surface)",
@@ -80,26 +82,34 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
       />
       <button
         onClick={handleAnalyze}
-        disabled={loading || !text.trim()}
+        disabled={loading}
         style={{
           position: "absolute",
           bottom: 12,
           right: 12,
           height: 40,
           minWidth: 80,
-          background: loading || !text.trim() ? "var(--c-muted)" : "var(--c-accent)",
-          color: "white",
+          background: loading
+            ? "var(--c-muted)"
+            : hasText
+              ? "var(--c-accent)"
+              : "white",
+          color: loading
+            ? "white"
+            : hasText
+              ? "white"
+              : "var(--c-accent)",
           padding: "0 20px",
           borderRadius: 20,
           fontSize: 14,
           fontWeight: 500,
-          border: "none",
-          cursor: loading || !text.trim() ? "not-allowed" : "pointer",
+          border: loading || hasText ? "none" : "1px solid var(--c-accent)",
+          cursor: loading ? "not-allowed" : "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           gap: 6,
-          opacity: loading || !text.trim() ? 0.5 : 1,
+          opacity: loading ? 0.5 : hasText ? 1 : 0.6,
           transition: "all 0.2s",
           fontFamily: "inherit",
           touchAction: "manipulation",
@@ -122,8 +132,10 @@ export function RentInput({ onResults, loadingText }: RentInputProps) {
             </span>
             {displayLoadingText}
           </>
+        ) : hasText ? (
+          "開始分析 →"
         ) : (
-          "開始分析"
+          "貼上貼文開始 →"
         )}
       </button>
       {error && (

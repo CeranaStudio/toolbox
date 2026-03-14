@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Home } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -100,11 +101,10 @@ export function PWAInstallToast() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 18,
             flexShrink: 0,
           }}
         >
-          🏠
+          <Home style={{ width: 20, height: 20, color: "white" }} />
         </div>
 
         {/* Text */}

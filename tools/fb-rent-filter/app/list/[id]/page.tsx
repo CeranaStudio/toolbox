@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { Check, Link as LinkIcon } from 'lucide-react';
+import { Check, Link as LinkIcon, Home, Plus, Map, Share2, Smartphone } from 'lucide-react';
 import { RentInput } from '@/components/RentInput';
 import { RentTable } from '@/components/RentTable';
 import { ExportBar } from '@/components/ExportBar';
@@ -10,6 +10,57 @@ import { PWAInstallToast } from '@/components/PWAInstallToast';
 import type { RentRecord } from '@/lib/schema';
 
 const RECORD_LIMIT = 30;
+const BROWSER_BANNER_KEY = "browser-banner-dismissed";
+
+function BrowserOpenBanner() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem(BROWSER_BANNER_KEY)) return;
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+    if (!isStandalone) setShow(true);
+  }, []);
+
+  if (!show) return null;
+
+  const dismiss = () => setShow(false);
+  const copyAndDismiss = () => {
+    navigator.clipboard.writeText(window.location.href);
+    localStorage.setItem(BROWSER_BANNER_KEY, "1");
+    setShow(false);
+  };
+
+  return (
+    <div style={{
+      background: "#FFF0EA",
+      borderBottom: "1px solid #F5C9B3",
+      padding: "8px max(16px, env(safe-area-inset-left))",
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      fontSize: 12,
+      color: "#C4411A",
+    }}>
+      <Smartphone style={{ width: 14, height: 14, flexShrink: 0 }} />
+      <span style={{ flex: 1 }}>已安裝 App？前往主畫面開啟「有室再說」，體驗更好</span>
+      <button onClick={copyAndDismiss} style={{
+        fontSize: 11, fontWeight: 600, color: "#C4411A",
+        background: "rgba(196,65,26,0.1)", border: "none", borderRadius: 6,
+        padding: "4px 10px", cursor: "pointer", fontFamily: "inherit",
+        whiteSpace: "nowrap", touchAction: "manipulation",
+      }}>
+        複製此連結
+      </button>
+      <button onClick={dismiss} style={{
+        fontSize: 14, color: "#C4411A", background: "none", border: "none",
+        cursor: "pointer", padding: "2px 4px", touchAction: "manipulation",
+      }}>✕</button>
+    </div>
+  );
+}
 
 interface SharedList {
   id: string;
@@ -247,7 +298,7 @@ export default function SharedListPage() {
               color: 'var(--c-text)', textDecoration: 'none',
             }}
           >
-            🗺️ <span className="desktop-only">地圖總覽</span>
+            <Map style={{ width: 16, height: 16 }} /> <span className="desktop-only">地圖總覽</span>
           </a>
           <button
             onClick={handleCopyLink}
@@ -272,6 +323,7 @@ export default function SharedListPage() {
           </button>
         </div>
       </nav>
+      <BrowserOpenBanner />
 
       <div className="list-page-content" style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(16px, 4vw, 24px) 80px' }}>
         {/* List header */}
@@ -451,7 +503,7 @@ export default function SharedListPage() {
           cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
           textDecoration: "none",
         }}>
-          <span style={{ fontSize: 20 }}>🏠</span>
+          <span style={{ lineHeight: 1 }}><Home style={{ width: 22, height: 22 }} /></span>
           <span>首頁</span>
         </a>
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{
@@ -460,7 +512,7 @@ export default function SharedListPage() {
           fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
           cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
         }}>
-          <span style={{ fontSize: 20 }}>➕</span>
+          <span style={{ lineHeight: 1 }}><Plus style={{ width: 22, height: 22 }} /></span>
           <span>新增</span>
         </button>
         <a href={`/list/${id}/map`} style={{
@@ -470,7 +522,7 @@ export default function SharedListPage() {
           cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
           textDecoration: "none",
         }}>
-          <span style={{ fontSize: 20 }}>🗺️</span>
+          <span style={{ lineHeight: 1 }}><Map style={{ width: 22, height: 22 }} /></span>
           <span>地圖</span>
         </a>
         <button onClick={handleCopyLink} style={{
@@ -479,7 +531,7 @@ export default function SharedListPage() {
           fontWeight: 500, color: "var(--c-muted)", background: "none", border: "none",
           cursor: "pointer", touchAction: "manipulation", fontFamily: "inherit",
         }}>
-          <span style={{ fontSize: 20 }}>🔗</span>
+          <span style={{ lineHeight: 1 }}><Share2 style={{ width: 22, height: 22 }} /></span>
           <span>分享</span>
         </button>
       </nav>
