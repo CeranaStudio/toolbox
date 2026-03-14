@@ -64,7 +64,7 @@ export default function Page() {
         >
           <img src="/logo.svg" alt="" style={{ width: 24, height: 24 }} />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--c-text)", letterSpacing: "-0.01em" }}>
-            租多好室
+            有室再說
           </span>
           <div style={{ flex: 1 }} />
           {backUrl && (

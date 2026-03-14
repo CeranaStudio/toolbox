@@ -3,13 +3,13 @@ import "./globals.css";
 import { RegisterSW } from "@/components/RegisterSW";
 
 export const metadata: Metadata = {
-  title: "租多好室",
+  title: "有室再說",
   description: "AI 幫你從社群貼文找出好室，整理、比較、分享，找房不再頭痛",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "租多好室",
+    title: "有室再說",
   },
   icons: {
     icon: "/logo.svg",
