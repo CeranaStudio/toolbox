@@ -1,0 +1,17 @@
+{
+  "name": "fb-rent-filter",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "fb_rent_filter_db",
+      "database_name": "fb-rent-filter-db",
+      "database_id": "ae874d9d-584a-475c-a99f-1c50b93ff171"
+    }
+  ]
+}

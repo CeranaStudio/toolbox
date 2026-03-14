@@ -1,0 +1,2 @@
+ALTER TABLE records ADD COLUMN status TEXT NOT NULL DEFAULT 'interested';
+ALTER TABLE records ADD COLUMN notes TEXT;
