@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FB 租屋過濾器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 320px;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #FAFAF8;
+      color: #1A1A18;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #E8E6E0;
+    }
+    .logo {
+      width: 20px;
+      height: 20px;
+      background: #E8572A;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .title { font-size: 13px; font-weight: 600; }
+    .body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #888882;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #E8E6E0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+      color: #1A1A18;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus {
+      border-color: #E8572A;
+      box-shadow: 0 0 0 3px #FFF0EA;
+    }
+    .row { display: flex; gap: 8px; }
+    .row > div { flex: 1; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background: #E8572A;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      touch-action: manipulation;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-stop {
+      width: 100%;
+      padding: 10px;
+      background: #1A1A18;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-stop:hover { opacity: 0.82; }
+
+    .status-box {
+      background: white;
+      border: 1px solid #E8E6E0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #888882;
+      line-height: 1.5;
+      min-height: 48px;
+    }
+    .status-box.running { border-color: #E8572A; color: #E8572A; }
+    .status-box.done { border-color: #10B981; color: #10B981; }
+    .status-box.error { border-color: #EF4444; color: #EF4444; }
+
+    .list-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #E8572A;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .list-link:hover { text-decoration: underline; }
+
+    .stats {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #888882;
+    }
+    .stats strong { color: #1A1A18; font-variant-numeric: tabular-nums; }
+
+    .divider { height: 1px; background: #E8E6E0; }
+    .footer {
+      padding: 10px 16px;
+      font-size: 11px;
+      color: #888882;
+      text-align: center;
+    }
+    .footer a { color: #E8572A; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">租</div>
+    <span class="title">FB 租屋過濾器</span>
+  </div>
+
+  <div class="body">
+    <!-- List URL -->
+    <div>
+      <label>清單連結（可選）</label>
+      <input
+        type="text"
+        id="listUrl"
+        placeholder="留空自動建立新清單"
+      />
+    </div>
+
+    <!-- Filters -->
+    <div class="row">
+      <div>
+        <label>租金上限（元）</label>
+        <input type="number" id="maxPrice" placeholder="不限" min="0" step="1000" />
+      </div>
+      <div>
+        <label>地區關鍵字</label>
+        <input type="text" id="district" placeholder="例：大安" />
+      </div>
+    </div>
+
+    <!-- Scroll settings -->
+    <div>
+      <label>最多掃幾頁（往下滑）</label>
+      <input type="number" id="maxScrolls" value="10" min="1" max="50" />
+    </div>
+
+    <!-- Start / Stop -->
+    <div id="actionArea">
+      <button class="btn-primary" id="startBtn">🔍 開始掃描</button>
+    </div>
+
+    <!-- Status -->
+    <div class="status-box" id="statusBox">
+      在 Facebook 租屋社團頁面開啟此 extension
+    </div>
+
+    <!-- Stats -->
+    <div class="stats" id="stats" style="display:none">
+      <span>已掃 <strong id="scanned">0</strong> 篇</span>
+      <span>已加入 <strong id="added">0</strong> 筆</span>
+      <span>快取命中 <strong id="cached">0</strong> 次</span>
+    </div>
+
+    <!-- List link (shown after adding) -->
+    <div id="listLinkArea" style="display:none">
+      <a class="list-link" id="listLink" target="_blank">
+        📋 開啟我的清單 →
+      </a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="footer">
+    <a href="https://fb-rent-filter.cerana-mail.workers.dev" target="_blank">fb-rent-filter.cerana-mail.workers.dev</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
